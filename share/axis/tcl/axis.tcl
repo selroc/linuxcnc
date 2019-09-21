@@ -2309,4 +2309,4 @@ proc show_menu_available {m} {
     }
 }
 
-# vim:ts=8:sts=4:et:sw=4:
+# vim:ts=8:sts=4:et:sw-4:

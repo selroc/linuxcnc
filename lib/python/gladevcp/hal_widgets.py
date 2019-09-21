@@ -13,7 +13,8 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-import gobject
+import gi
+from   gi.repository import GObject as gobject
 import gtk
 
 import hal
@@ -261,14 +262,14 @@ class HAL_ProgressBar(gtk.ProgressBar, _HalWidgetBase):
 
     def do_get_property(self, property):
         name = property.name.replace('-', '_')
-        if name in self.__gproperties.keys():
+        if name in list(self.__gproperties.keys()):
             return getattr(self, name)
         else:
             raise AttributeError('unknown property %s' % property.name)
 
     def do_set_property(self, property, value):
         name = property.name.replace('-', '_')
-        if name in self.__gproperties.keys():
+        if name in list(self.__gproperties.keys()):
             return setattr(self, name, value)
         else:
             raise AttributeError('unknown property %s' % property.name)

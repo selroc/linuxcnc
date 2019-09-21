@@ -1,0 +1,84 @@
+// PY3testing  include at beginning of rs274ngc_pre.cc:Interp::Interp
+
+fprintf(stderr,"\n\n0_PY3_INTERP_TESTS________________________________ _task=%d\n",_task);
+
+#if 1 //example import sys get attr
+  bp::object sys = bp::import("sys");
+  std::string version = bp::extract<std::string>(sys.attr("version"));
+  fprintf(stderr,"Interp::Interp _task=%d\nsys.version:%s\n",_task,version.c_str());
+#endif
+
+#if 1
+fprintf(stderr,"1_TESTA import tests\n");
+if (1 || _task==0) {
+    int stat=0;
+    fprintf(stderr,"2_TESTA INSTANTIATE builtin_modules\n");
+    if (!PythonPlugin::instantiate(builtin_modules)) {
+        fprintf(stderr,"3_TESTA instantiate fail\n");
+    }
+    stat =python_plugin->configure("/home/git/linuxcnc-dev/configs/sim/axis/axis.ini"
+                                , "PYTHON");
+    if (stat == PLUGIN_OK) {
+        fprintf(stderr,"4_TESTA configure ok\n");
+    } else {
+        fprintf(stderr,"5_TESTA stat=%d\n",stat);
+    }
+}
+
+try {
+    //why ImportError: 'interpreter' is not a built-in module
+    fprintf(stderr,"6_TESTA import test\n");
+    bp::object interp_module = bp::import("lineardeltakins");
+    bp::object ginterp_module = bp::import("gcode");       //success
+    bp::object minterp_module = bp::import("minigl");      //success
+    //bp::object einterp_module = bp::import("emccanon");    //fail
+    bp::object iinterp_module = bp::import("interpreter"); //fail
+}
+catch (bp::error_already_set) {
+    if (PyErr_Occurred()) {
+      fprintf(stderr,"7_TESTA PyErr_Occurred\n");
+      PyErr_Print();
+    } else {
+      fprintf(stderr,"8_TESTA unknown exception\n");
+    }
+    PyErr_Clear();
+}
+fprintf(stderr,"E_TESTA\n");
+#endif
+
+#if 0
+if (1 || _task==0) {
+  try {
+  bp::object main_module = bp::import("__main__");
+  bp::object main_namespace = main_module.attr("__dict__");
+  fprintf(stderr,"\n__main__.builtins\n");
+  bp::object ig1 = bp::eval("print(dir('__main__.builtins'))", main_namespace,main_namespace);
+  fprintf(stderr,"\n__main__\n");
+  bp::object ig2 = bp::eval("print(dir('__main__'))", main_namespace,main_namespace);
+
+  fprintf(stderr,"1_TESTB _task=%d\n",_task);
+  //for (int i = 0; i < bp::len(iterkeys); i++)  {
+  //  std::string key = bp::extract<std::string>(iterkeys[i]);
+  //  fprintf(stderr,"key:%s\n",key.c_str());
+  //}
+  }
+  catch (bp::error_already_set) {
+    if (PyErr_Occurred()) {
+      fprintf(stderr,"2_TESTB PyErr_Occurred\n");
+      PyErr_Print();
+    } else {
+      fprintf(stderr,"3_TESTB unknown exception\n");
+    }
+    PyErr_Clear();
+  }
+}
+fprintf(stderr,"E_TESTB\n");
+#endif
+
+
+
+fprintf(stderr,"\n\n0_BEGIN: RS274NGC_PRE _task=%d\n",_task);
+fprintf(stderr,"0_BEGIN: initfunc=%p\n",builtin_modules[0].initfunc);
+fprintf(stderr,"0_BEGIN: name=    %s\n",builtin_modules[0].name);
+
+fprintf(stderr,"E_PY3_INTERP_TESTS________________________________ _task=%d\n\n",_task);

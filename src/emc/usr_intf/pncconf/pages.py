@@ -31,7 +31,8 @@
 
 import gtk
 import os
-import gobject
+import gi
+from   gi.repository import GObject as gobject
 
 class Pages:
     def __init__(self, app):

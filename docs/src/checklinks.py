@@ -1,4 +1,4 @@
-import os, sys, sgmllib, cookielib, urllib, htmlentitydefs
+import os, sys, sgmllib, http.cookiejar, urllib.request, urllib.parse, urllib.error, html.entities
 
 if len(sys.argv) > 1:
     ref = sys.argv[1]
@@ -21,13 +21,13 @@ class MetaHandler:
         equiv = get("http-equiv", attrs)
         content = get("content", attrs)
         if equiv != "content-type": return
-        attrs = cookielib.split_header_words([content])[0]
+        attrs = http.cookiejar.split_header_words([content])[0]
         encoding = get("charset", attrs)
         if encoding == "ASCII": encoding = "ISO-8859-1"
         if encoding: self.encoding = encoding
 
 class get_refs(sgmllib.SGMLParser, MetaHandler):
-    entitydefs = htmlentitydefs.entitydefs
+    entitydefs = html.entities.entitydefs
 
     def __init__(self, verbose=0):
         sgmllib.SGMLParser.__init__(self, verbose)
@@ -38,11 +38,11 @@ class get_refs(sgmllib.SGMLParser, MetaHandler):
         href = get('href', attrs)
         if self.encoding:
             href = href.decode(self.encoding)
-        href = urllib.unquote(href)
+        href = urllib.parse.unquote(href)
 	self.refs.add(href)
 
 class get_anchors(sgmllib.SGMLParser, MetaHandler):
-    entitydefs = htmlentitydefs.entitydefs
+    entitydefs = html.entities.entitydefs
 
     def __init__(self, verbose=0):
         sgmllib.SGMLParser.__init__(self, verbose)
@@ -60,7 +60,7 @@ class get_anchors(sgmllib.SGMLParser, MetaHandler):
         name = get('name', attrs, get('id', attrs))
         if self.encoding:
             name = name.decode(self.encoding)
-        name = urllib.unquote(name)
+        name = urllib.parse.unquote(name)
         if name:
             self.anchors.add(name)
 
@@ -108,20 +108,20 @@ for r in refs:
 	good.add(r)
 
 if missing_file:
-    print "Files linked to in %s but could not be found:" % (
-        os.path.basename(ref),)
+    print("Files linked to in %s but could not be found:" % (
+        os.path.basename(ref),))
     for i in sorted(missing_file):
-        print "\t%r" % i
+        print("\t%r" % i)
 if missing_anchor:
-    print "Anchors used in %s but not defined in linked file:" % (
-        os.path.basename(ref),)
+    print("Anchors used in %s but not defined in linked file:" % (
+        os.path.basename(ref),))
     for i in sorted(missing_anchor):
-        print "\t%r" % i
+        print("\t%r" % i)
 if unlisted_targets:
-    print "Links to files not listed as targets:"
+    print("Links to files not listed as targets:")
     for i in sorted(unlisted_targets):
-	print "\t%r" % i
-    print "If all link targets are not listed in the Submakefile, then the results of this program is unreliable."
-print "Good links: %d/%d" % (len(good), len(refs))
+	print("\t%r" % i)
+    print("If all link targets are not listed in the Submakefile, then the results of this program is unreliable.")
+print("Good links: %d/%d" % (len(good), len(refs)))
 if missing_anchor or missing_file or unlisted_targets:
-    raise SystemExit, 1
+    raise SystemExit(1)

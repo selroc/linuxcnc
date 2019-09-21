@@ -25,9 +25,11 @@
 
 import gtk
 import gladevcp
-import pango
 
-import gobject
+import gi
+from   gi.repository import GObject as gobject
+gi.require_version ('Pango','1.0')
+from   gi.repository import Pango as pango
 
 class Dialogs(gobject.GObject):
 

@@ -122,7 +122,7 @@ class HandlerClass:
             self.builder.get_object('skip-ihs-distance-adj').configure(0,0,99,.1,0,0)
             self.builder.get_object('skip-ihs-distance').set_value(0)
         else:
-            print '*** incorrect [TRAJ]LINEAR_UNITS in ini file'
+            print('*** incorrect [TRAJ]LINEAR_UNITS in ini file')
 
     def periodic(self):
         units = hal.get_value('halui.machine.units-per-mm')
@@ -206,7 +206,7 @@ class HandlerClass:
                         if 'gtk_theme' in line and not 'Follow System Theme' in line:
                             (item, theme) = line.strip().replace(" ", "").split('=')
             except:
-                print('*** configuration file, {} is invalid ***'.format(self.prefFile))
+                print(('*** configuration file, {} is invalid ***'.format(self.prefFile)))
         else:
             theme = self.i.find('PLASMAC', 'THEME') or gtk.settings_get_default().get_property('gtk-theme-name')
             font = self.i.find('PLASMAC', 'FONT') or gtk.settings_get_default().get_property('gtk-font-name')
@@ -246,28 +246,28 @@ class HandlerClass:
                                     self.configDict[key] = value
                                     tmpDict[key] = value
             except:
-                print('*** plasmac config tab configuration file, {} is invalid ***'.format(self.configFile))
+                print(('*** plasmac config tab configuration file, {} is invalid ***'.format(self.configFile)))
             for item in self.configDict:
                 if isinstance(self.builder.get_object(item), gladevcp.hal_widgets.HAL_SpinButton):
                     if item in tmpDict:
                         self.builder.get_object(item).set_value(float(self.configDict.get(item)))
                     else:
-                        print('*** {} missing from {}'.format(item,self.configFile))
+                        print(('*** {} missing from {}'.format(item,self.configFile)))
                 elif isinstance(self.builder.get_object(item), gladevcp.hal_widgets.HAL_CheckButton):
                     if item in tmpDict:
                         self.builder.get_object(item).set_active(int(self.configDict.get(item)))
                     else:
-                        print('*** {} missing from {}'.format(item,self.configFile))
+                        print(('*** {} missing from {}'.format(item,self.configFile)))
         else:
             self.save_settings()
-            print('*** creating new config tab configuration file, {}'.format(self.configFile))
+            print(('*** creating new config tab configuration file, {}'.format(self.configFile)))
 
     def save_settings(self):
         try:
             with open(self.configFile, 'w') as f_out:
                 f_out.write('# plasmac config tab configuration file\n# format is: name = value\n\n')
                 f_out.write('version=0.1\n\n')
-                for key in sorted(self.configDict.iterkeys()):
+                for key in sorted(self.configDict.keys()):
                     if isinstance(self.builder.get_object(key), gladevcp.hal_widgets.HAL_SpinButton):
                         self.builder.get_object(key).update()
                         value = self.builder.get_object(key).get_value()
@@ -279,7 +279,7 @@ class HandlerClass:
                         value = self.builder.get_object(key).get_value()
                         f_out.write(key + '=' + str(value) + '\n')
         except:
-            print('*** error opening {}'.format(self.configFile))
+            print(('*** error opening {}'.format(self.configFile)))
 
     def upgrade_check(self):
         with open(self.configFile, 'r') as f_in:
@@ -308,7 +308,7 @@ class HandlerClass:
             f_out = open(self.configFile, 'w')
             f_out.writelines(contents)
         else:
-            print('*** plasmac run tab configuration file, {} is invalid ***'.format(runFile))
+            print(('*** plasmac run tab configuration file, {} is invalid ***'.format(runFile)))
 
     def check_hal_connections(self):
         level = int(self.i.find('TRAJ', 'SPINDLES')) or 1

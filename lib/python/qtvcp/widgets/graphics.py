@@ -23,7 +23,8 @@ from PyQt5.QtWidgets import QWidget
 from PyQt5.QtGui import QWindow, QResizeEvent
 from qtvcp.core import Status
 import thread
-import gobject
+import gi
+from   gi.repository import GObject as gobject
 
 import linuxcnc
 import gremlin

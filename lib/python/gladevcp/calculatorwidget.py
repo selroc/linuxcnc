@@ -18,8 +18,11 @@
 
 # This fixes integer division error
 # so dividing two integers gives a float
-from __future__ import division
-import sys, os, pango
+
+import sys, os
+import gi
+gi.require_version ('Pango','1.0')
+from   gi.repository import Pango as pango
 import math
 
 # localization
@@ -29,7 +32,8 @@ locale.setlocale( locale.LC_ALL, '' )
 datadir = os.path.abspath( os.path.dirname( __file__ ) )
 
 try:
-    import gobject, gtk
+    import gtk
+    from   gi.repository import GObject as gobject
 except:
     print( 'GTK not available' )
     sys.exit( 1 )
@@ -160,7 +164,7 @@ class Calculator( gtk.VBox ):
                 b = str( eval( qualified ) )
         except:
             b = "Error"
-            print"Calculator widget error, string:", self.eval_string, sys.exc_info()[0]
+            print("Calculator widget error, string:", self.eval_string, sys.exc_info()[0])
             self.eval_string = ''
         else  : self.eval_string = b
         # if locale.localeconv()["decimal_point" = comma ,
@@ -255,7 +259,7 @@ class Calculator( gtk.VBox ):
 
     def do_get_property( self, property ):
         name = property.name.replace( '-', '_' )
-        if name in self.__gproperties.keys():
+        if name in list(self.__gproperties.keys()):
             return getattr( self, name )
         else:
             raise AttributeError( 'unknown property %s' % property.name )
@@ -287,9 +291,9 @@ def main():
     window.show_all()
     response = window.run()
     if response == gtk.RESPONSE_ACCEPT:
-       print calc.get_value()
+       print(calc.get_value())
     else:
-       print calc.get_preset_value()
+       print(calc.get_preset_value())
 
 if __name__ == "__main__":
     main()

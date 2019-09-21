@@ -54,25 +54,25 @@ class EmcToolTable(object):
         for p in range(start,len(tooltable)):
             t = tooltable[p]
             if t.toolno != -1:
-                print >> fp, "T%d P%d" % (t.toolno, p if self.random_toolchanger else fms[p]),
-                if t.diameter:  print >> fp, "D%f" % (t.diameter),
-                if t.offset.x: print >> fp, "X%+f" % (t.offset.x),
-                if t.offset.y: print >> fp, "Y%+f" % (t.offset.y),
-                if t.offset.z: print >> fp, "Z%+f" % (t.offset.z),
-                if t.offset.a: print >> fp, "A%+f" % (t.offset.a),
-                if t.offset.b: print >> fp, "B%+f" % (t.offset.b),
-                if t.offset.c: print >> fp, "C%+f" % (t.offset.c),
-                if t.offset.u: print >> fp, "U%+f" % (t.offset.u),
-                if t.offset.v: print >> fp, "V%+f" % (t.offset.v),
-                if t.offset.w: print >> fp, "W%+f" % (t.offset.w),
-                if t.offset.w: print >> fp, "W%+f" % (t.offset.w),
-                if t.frontangle: print >> fp, "I%+f" % (t.frontangle),
-                if t.backangle: print >> fp, "J%+f" % (t.backangle),
-                if t.orientation: print >> fp, "Q%+d" % (t.orientation),
-                if comments.has_key(p) and comments[p]:
-                    print >> fp, ";%s" % (comments[p])
+                print("T%d P%d" % (t.toolno, p if self.random_toolchanger else fms[p]), end=' ', file=fp)
+                if t.diameter:  print("D%f" % (t.diameter), end=' ', file=fp)
+                if t.offset.x: print("X%+f" % (t.offset.x), end=' ', file=fp)
+                if t.offset.y: print("Y%+f" % (t.offset.y), end=' ', file=fp)
+                if t.offset.z: print("Z%+f" % (t.offset.z), end=' ', file=fp)
+                if t.offset.a: print("A%+f" % (t.offset.a), end=' ', file=fp)
+                if t.offset.b: print("B%+f" % (t.offset.b), end=' ', file=fp)
+                if t.offset.c: print("C%+f" % (t.offset.c), end=' ', file=fp)
+                if t.offset.u: print("U%+f" % (t.offset.u), end=' ', file=fp)
+                if t.offset.v: print("V%+f" % (t.offset.v), end=' ', file=fp)
+                if t.offset.w: print("W%+f" % (t.offset.w), end=' ', file=fp)
+                if t.offset.w: print("W%+f" % (t.offset.w), end=' ', file=fp)
+                if t.frontangle: print("I%+f" % (t.frontangle), end=' ', file=fp)
+                if t.backangle: print("J%+f" % (t.backangle), end=' ', file=fp)
+                if t.orientation: print("Q%+d" % (t.orientation), end=' ', file=fp)
+                if p in comments and comments[p]:
+                    print(";%s" % (comments[p]), file=fp)
                 else:
-                    print >> fp
+                    print(file=fp)
         fp.close()
 
     def assign(self,tooltable,entry,comments,fms):
@@ -80,17 +80,17 @@ class EmcToolTable(object):
         if not self.random_toolchanger:
             self.fakepocket += 1
             if self.fakepocket >= len(tooltable):
-                print "too many tools. skipping tool %d" % (toolno)
+                print("too many tools. skipping tool %d" % (toolno))
                 return
             if not fms is None:
                 fms[self.fakepocket] = pocket
             pocket = self.fakepocket
         if pocket < 0 or pocket > len(tooltable):
-            print "max pocket number is %d. skipping tool %d" % (len(tooltable) - 1, toolno)
+            print("max pocket number is %d. skipping tool %d" % (len(tooltable) - 1, toolno))
             return
 
         tooltable[pocket].zero()
-        for (key,value) in entry.items():
+        for (key,value) in list(entry.items()):
             if key == 'T' : tooltable[pocket].toolno = value
             if key == 'Q' : tooltable[pocket].orientation = value
             if key == 'D' : tooltable[pocket].diameter = value
@@ -127,10 +127,10 @@ class EmcToolTable(object):
                     key = name.upper()
                     result[key] = EmcToolTable.ttype[key](value)
                 else:
-                    print "%s:%d  bad line: '%s' " % (self.filename, lineno, entry)
+                    print("%s:%d  bad line: '%s' " % (self.filename, lineno, entry))
             result['comment'] = comment
             return result
-        print "%s:%d: unrecognized tool table entry   '%s'" % (self.filename,lineno,line)
+        print("%s:%d: unrecognized tool table entry   '%s'" % (self.filename,lineno,line))
 
 
     def restore_state(self,e):

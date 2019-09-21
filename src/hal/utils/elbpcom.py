@@ -64,8 +64,8 @@ def transact(sdata, quiet=False, response=True):
     if not response: return
     try:
         data, daddr = s.recvfrom(1280)
-        if not quiet: print("<", data.encode("hex"))
-        if not quiet: print("     ", re.sub('[^ -~]', '.', data))
+        if not quiet: print(("<", data.encode("hex")))
+        if not quiet: print(("     ", re.sub('[^ -~]', '.', data)))
         return data
     except socket.timeout:
         if not quiet: print("! no response")
@@ -74,7 +74,7 @@ def transact(sdata, quiet=False, response=True):
 def interact():
     try:
         while 1:
-            sdata = input("> ")
+            sdata = eval(input("> "))
             if not sdata.strip(): break
             transact(sdata)
     except KeyboardInterrupt:
@@ -114,7 +114,7 @@ if options.read:
     size = optimal_size(options.space, options.info, options.address, options.read if options.increment else 0)
     command = make_read_request(options.space, options.info, size, options.increment, options.address, options.read)
     command = command.encode("hex")
-    print(">", command)
+    print((">", command))
     transact(command)
 
 elif options.write:
@@ -124,7 +124,7 @@ elif options.write:
     size = optimal_size(options.space, options.info, options.address, len(write) if options.increment else 0)
     command = make_write_request(options.space, options.info, size, options.increment, options.address, write)
     command = command.encode("hex")
-    print(">", command)
+    print((">", command))
     transact(command, response=False)
 
 elif args:

@@ -249,8 +249,8 @@ class HandlerClass:
             self.widgets.btn_blockheight.set_sensitive(False)
             self.widgets.lbl_blockheight.hide()
             self.widgets.chk_use_auto_zref.set_sensitive(False)
-            print(_("No valid tool sensor location"))
-            print(_("Block Height - Disabled"))
+            print((_("No valid tool sensor location")))
+            print((_("Block Height - Disabled")))
         else:
             self.widgets.lbl_tool_measurement.hide()
             self.widgets.lbl_xpos.set_label(str(xpos))
@@ -265,7 +265,7 @@ class HandlerClass:
             self.tool_sensor_x = xpos
             self.tool_sensor_y = ypos
             self.tool_sensor_z = zpos
-            print(_("Block Height - Enabled"))
+            print((_("Block Height - Enabled")))
         self.widgets.chk_use_auto_zref.emit("toggled")
         # set up laser crosshair offsets
         xpos = self.gscreen.inifile.find("LASER", "X")
@@ -346,7 +346,7 @@ class HandlerClass:
         try:
             self.stat.poll()
         except:
-            raise SystemExit, "SilverDragon cannot poll linuxcnc status any more"
+            raise SystemExit("SilverDragon cannot poll linuxcnc status any more")
         error = self.error_channel.poll()
         if error:
             self.gscreen.notify(_("ERROR"), _(error), ALERT_ICON)
@@ -409,7 +409,7 @@ class HandlerClass:
 
     # estop machine before closing
     def on_window1_destroy(self, widget, data=None):
-        print "estopping / killing silverdragon"
+        print("estopping / killing silverdragon")
         self.command.state(linuxcnc.STATE_OFF)
         self.command.state(linuxcnc.STATE_ESTOP)
         gtk.main_quit()
@@ -1338,7 +1338,7 @@ class HandlerClass:
         elif command == "reverse":
             self.command.spindle(-1, rpm_out)
         else:
-            print(_("Something went wrong, we have an unknown spindle widget {0}").format(command))
+            print((_("Something went wrong, we have an unknown spindle widget {0}").format(command)))
 
     def update_progress(self):
         if self.stat.task_mode != linuxcnc.MODE_AUTO:
@@ -1373,7 +1373,7 @@ class HandlerClass:
     def init_file_to_load(self):
         default_path = self.gscreen.inifile.find("DISPLAY", "PROGRAM_PREFIX")
         if not default_path:
-            print("Path %s from DISPLAY , PROGRAM_PREFIX does not exist" % default_path)
+            print(("Path %s from DISPLAY , PROGRAM_PREFIX does not exist" % default_path))
             print("Trying default path...")
             default_path = "~/linuxcnc/nc_files/"
         open_file = self.gscreen.inifile.find("DISPLAY", "OPEN_FILE")

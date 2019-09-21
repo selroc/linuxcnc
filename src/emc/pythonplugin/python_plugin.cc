@@ -16,6 +16,7 @@
  *    along with this program; if not, write to the Free Software
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+extern int _task;
 #include "python_plugin.hh"
 #include "inifile.hh"
 
@@ -238,30 +239,40 @@ std::string handle_pyerror()
 {
     PyObject *exc, *val, *tb;
     bp::object formatted_list, formatted;
-
+fprintf(stderr,"0____HHHHHHH\n");
     PyErr_Fetch(&exc, &val, &tb);
     bp::handle<> hexc(exc), hval(bp::allow_null(val)), htb(bp::allow_null(tb));
     bp::object traceback(bp::import("traceback"));
     if (!tb) {
+fprintf(stderr,"1____HHHHHHH\n");
 	bp::object format_exception_only(traceback.attr("format_exception_only"));
 	formatted_list = format_exception_only(hexc, hval);
     } else {
+fprintf(stderr,"2____HHHHHHH\n");
 	bp::object format_exception(traceback.attr("format_exception"));
 	formatted_list = format_exception(hexc, hval, htb);
     }
+fprintf(stderr,"3____HHHHHHH\n");
     formatted = bp::str("\n").join(formatted_list);
     return bp::extract<std::string>(formatted);
 }
 
 int PythonPlugin::initialize()
 {
+extern int _task;
     std::string msg;
+    fprintf(stderr,"0_____ PLUGIN INITIALIZE is:%d _task=%d\n",Py_IsInitialized(),_task);
     if (Py_IsInitialized()) {
 	try {
 	    bp::object module = bp::import("__main__");
+
 	    main_namespace = module.attr("__dict__");
 
+            fprintf(stderr,"1_____ PLUGIN INITIALIZE inittab_entries.size=%d\n",
+                    (int)inittab_entries.size()  );
 	    for(unsigned i = 0; i < inittab_entries.size(); i++) {
+                fprintf(stderr,"2_____ PLUGIN INITIALIZE name=%s\n",
+                    inittab_entries[i].c_str() );
 		main_namespace[inittab_entries[i]] = bp::import(inittab_entries[i].c_str());
 	    }
 	    if (toplevel) // only execute a file if there's one configured.
@@ -298,15 +309,16 @@ PythonPlugin::PythonPlugin(struct _inittab *inittab) :
     abs_path(0),
     log_level(0)
 {
-    Py_SetProgramName((char *) abs_path);
+    fprintf(stderr,"0____ PLUGIN CONSTRUCT\n");
 
-    if ((inittab != NULL) &&
-	PyImport_ExtendInittab(inittab)) {
+    if ((inittab != NULL) && PyImport_ExtendInittab(inittab)) {
+        fprintf(stderr,"F____ PLUGIN CONSTRUCT FAIL\n");
 	logPP(-1, "cant extend inittab");
 	status = PLUGIN_INITTAB_FAILED;
 	return;
     }
     Py_Initialize();
+    fprintf(stderr,"E____ PLUGIN CONSTRUCT, Py_Initialize()\n");
     initialize();
 }
 
@@ -409,9 +421,17 @@ PythonPlugin *python_plugin;
 // this splits instantiation from configuring PYTHONPATH, imports etc
 PythonPlugin *PythonPlugin::instantiate(struct _inittab *inittab)
 {
+    fprintf(stderr,"0__ PLUGIN INSTANTIATE (%s,%p) _task=%d pid=%d\n"
+           ,inittab->name,inittab->initfunc,_task,(int)getpid());
+
     if (python_plugin == NULL) {
 	python_plugin = new PythonPlugin(inittab);
+        //PY3dng the result %p is bogus for _task==0 ???????????????????
+        fprintf(stderr,"1__ PLUGIN INSTANTIATE python_plugin=%p <----------\n"
+               ,python_plugin);
     }
+    fprintf(stderr,"E__ PLUGIN INSTANTIATE usable=%d\n"
+           ,python_plugin->usable() );
     return (python_plugin->usable()) ? python_plugin : NULL;
 }
 

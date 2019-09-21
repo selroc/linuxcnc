@@ -16,15 +16,15 @@ def mkpre(s):
 		('  ', ' &nbsp;'), ('\n', '<BR>'), ('\\', '&#92;')]
 
     h = "".join(s)
-    print ".ie '\\*[.T]'html' .HTML <PRE>%s</PRE>" % substall(h, hsubst)
-    print ".el \\{\\"
-    print ".ft CR"
+    print(".ie '\\*[.T]'html' .HTML <PRE>%s</PRE>" % substall(h, hsubst))
+    print(".el \\{\\")
+    print(".ft CR")
     for i, line in enumerate(s):
 	if i != 0:
-	    print r".PP"
-	print substall(line.strip("\n"), msubst)
-    print ".ft R"
-    print r"\}"
+	    print(r".PP")
+	print(substall(line.strip("\n"), msubst))
+    print(".ft R")
+    print(r"\}")
 
 import sys
 mkpre(list(sys.stdin))

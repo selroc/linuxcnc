@@ -55,4 +55,4 @@ def lookup(image):
 i = lookup(image)
 if not i:
 	i = image
-print relpath(i, docpath)
+print(relpath(i, docpath))

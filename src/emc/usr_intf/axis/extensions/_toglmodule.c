@@ -69,6 +69,18 @@ PyMethodDef togl_methods[] = {
 };
 
 PyMODINIT_FUNC
-init_togl(void) {
-    Py_InitModule3("_togl", togl_methods, "togl extension for Tkinter");
+PyInit__togl(void) { //note two underlines (__) reqd PY3fix
+    static struct PyModuleDef moduledef = {
+           PyModuleDef_HEAD_INIT,
+           "_togl",       /* m_name */
+           "togl extension for tkinter",/* m_doc */
+           -1,            /* m_size */
+           togl_methods,  /* m_methods */
+           NULL,          /* m_reload */
+           NULL,          /* m_traverse */
+           NULL,          /* m_clear */
+           NULL,          /* m_free */
+           };
+    PyObject *m = PyModule_Create(&moduledef);
+    return m;
 }

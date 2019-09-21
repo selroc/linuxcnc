@@ -19,93 +19,93 @@ def print_status(status):
     """Prints all the fields of the status buffer.  Does not call
     poll()."""
 
-    print "acceleration:", status.acceleration
-    print "active_queue:", status.active_queue
-    print "actual_position:", status.actual_position
-    print "adaptive_feed_enabled:", status.adaptive_feed_enabled
-    print "ain:", status.ain
-    print "angular_units:", status.angular_units
-    print "aout:", status.aout
-    print "axes:", status.axes
-    print "axis:", status.axis
-    print "axis_mask:", status.axis_mask
-    print "block_delete:", status.block_delete
-    print "call_level:", status.call_level
-    print "command:", status.command
-    print "current_line:", status.current_line
-    print "current_vel:", status.current_vel
-    print "cycle_time:", status.cycle_time
-    print "debug:", status.debug
-    print "delay_left:", status.delay_left
-    print "din:", status.din
-    print "distance_to_go:", status.distance_to_go
-    print "dout:", status.dout
-    print "dtg:", status.dtg
-    print "echo_serial_number:", status.echo_serial_number
-    print "enabled:", status.enabled
-    print "estop:", status.estop
-    print "exec_state:", status.exec_state
-    print "feed_hold_enabled:", status.feed_hold_enabled
-    print "feed_override_enabled:", status.feed_override_enabled
-    print "feedrate:", status.feedrate
-    print "file:", status.file
-    print "flood:", status.flood
-    print "g5x_index:", status.g5x_index
-    print "g5x_offset:", status.g5x_offset
-    print "g92_offset:", status.g92_offset
-    print "gcodes:", status.gcodes
-    print "homed:", status.homed
-    print "id:", status.id
-    print "inpos:", status.inpos
-    print "input_timeout:", status.input_timeout
-    print "interp_state:", status.interp_state
-    print "interpreter_errcode:", status.interpreter_errcode
-    print "joint:", status.joint
-    print "joint_actual_position:", status.joint_actual_position
-    print "joint_position:", status.joint_position
-    print "joints:", status.joints
-    print "kinematics_type:", status.kinematics_type
-    print "limit:", status.limit
-    print "linear_units:", status.linear_units
-    print "lube:", status.lube
-    print "lube_level:", status.lube_level
-    print "max_acceleration:", status.max_acceleration
-    print "max_velocity:", status.max_velocity
-    print "mcodes:", status.mcodes
-    print "mist:", status.mist
-    print "motion_line:", status.motion_line
-    print "motion_mode:", status.motion_mode
-    print "motion_type:", status.motion_type
-    print "optional_stop:", status.optional_stop
-    print "paused:", status.paused
-    print "pocket_prepped:", status.pocket_prepped
-    print "position:", status.position
-    print "probe_tripped:", status.probe_tripped
-    print "probe_val:", status.probe_val
-    print "probed_position:", status.probed_position
-    print "probing:", status.probing
-    print "program_units:", status.program_units
-    print "queue:", status.queue
-    print "queue_full:", status.queue_full
-    print "queued_mdi_commands:", status.queued_mdi_commands
-    print "rapidrate:", status.rapidrate
-    print "read_line:", status.read_line
-    print "rotation_xy:", status.rotation_xy
-    print "settings:", status.settings
-    print "spindle_brake:", status.spindle[0]['brake']
-    print "spindle_direction:", status.spindle[0]['direction']
-    print "spindle_enabled:", status.spindle[0]['enabled']
-    print "spindle_override_enabled:", status.spindle[0]['override_enabled']
-    print "spindle_speed:", status.spindle[0]['speed']
-    print "spindlerate:", status.spindle[0]['override']
-    print "state:", status.state
-    print "task_mode:", status.task_mode
-    print "task_paused:", status.task_paused
-    print "task_state:", status.task_state
-    print "tool_in_spindle:", status.tool_in_spindle
-    print "tool_offset:", status.tool_offset
-    print "tool_table:", status.tool_table
-    print "velocity:", status.velocity
+    print("acceleration:", status.acceleration)
+    print("active_queue:", status.active_queue)
+    print("actual_position:", status.actual_position)
+    print("adaptive_feed_enabled:", status.adaptive_feed_enabled)
+    print("ain:", status.ain)
+    print("angular_units:", status.angular_units)
+    print("aout:", status.aout)
+    print("axes:", status.axes)
+    print("axis:", status.axis)
+    print("axis_mask:", status.axis_mask)
+    print("block_delete:", status.block_delete)
+    print("call_level:", status.call_level)
+    print("command:", status.command)
+    print("current_line:", status.current_line)
+    print("current_vel:", status.current_vel)
+    print("cycle_time:", status.cycle_time)
+    print("debug:", status.debug)
+    print("delay_left:", status.delay_left)
+    print("din:", status.din)
+    print("distance_to_go:", status.distance_to_go)
+    print("dout:", status.dout)
+    print("dtg:", status.dtg)
+    print("echo_serial_number:", status.echo_serial_number)
+    print("enabled:", status.enabled)
+    print("estop:", status.estop)
+    print("exec_state:", status.exec_state)
+    print("feed_hold_enabled:", status.feed_hold_enabled)
+    print("feed_override_enabled:", status.feed_override_enabled)
+    print("feedrate:", status.feedrate)
+    print("file:", status.file)
+    print("flood:", status.flood)
+    print("g5x_index:", status.g5x_index)
+    print("g5x_offset:", status.g5x_offset)
+    print("g92_offset:", status.g92_offset)
+    print("gcodes:", status.gcodes)
+    print("homed:", status.homed)
+    print("id:", status.id)
+    print("inpos:", status.inpos)
+    print("input_timeout:", status.input_timeout)
+    print("interp_state:", status.interp_state)
+    print("interpreter_errcode:", status.interpreter_errcode)
+    print("joint:", status.joint)
+    print("joint_actual_position:", status.joint_actual_position)
+    print("joint_position:", status.joint_position)
+    print("joints:", status.joints)
+    print("kinematics_type:", status.kinematics_type)
+    print("limit:", status.limit)
+    print("linear_units:", status.linear_units)
+    print("lube:", status.lube)
+    print("lube_level:", status.lube_level)
+    print("max_acceleration:", status.max_acceleration)
+    print("max_velocity:", status.max_velocity)
+    print("mcodes:", status.mcodes)
+    print("mist:", status.mist)
+    print("motion_line:", status.motion_line)
+    print("motion_mode:", status.motion_mode)
+    print("motion_type:", status.motion_type)
+    print("optional_stop:", status.optional_stop)
+    print("paused:", status.paused)
+    print("pocket_prepped:", status.pocket_prepped)
+    print("position:", status.position)
+    print("probe_tripped:", status.probe_tripped)
+    print("probe_val:", status.probe_val)
+    print("probed_position:", status.probed_position)
+    print("probing:", status.probing)
+    print("program_units:", status.program_units)
+    print("queue:", status.queue)
+    print("queue_full:", status.queue_full)
+    print("queued_mdi_commands:", status.queued_mdi_commands)
+    print("rapidrate:", status.rapidrate)
+    print("read_line:", status.read_line)
+    print("rotation_xy:", status.rotation_xy)
+    print("settings:", status.settings)
+    print("spindle_brake:", status.spindle[0]['brake'])
+    print("spindle_direction:", status.spindle[0]['direction'])
+    print("spindle_enabled:", status.spindle[0]['enabled'])
+    print("spindle_override_enabled:", status.spindle[0]['override_enabled'])
+    print("spindle_speed:", status.spindle[0]['speed'])
+    print("spindlerate:", status.spindle[0]['override'])
+    print("state:", status.state)
+    print("task_mode:", status.task_mode)
+    print("task_paused:", status.task_paused)
+    print("task_state:", status.task_state)
+    print("tool_in_spindle:", status.tool_in_spindle)
+    print("tool_offset:", status.tool_offset)
+    print("tool_table:", status.tool_table)
+    print("velocity:", status.velocity)
     sys.stdout.flush()
 
 
@@ -179,7 +179,7 @@ l = linuxcnc_util.LinuxCNC()
 # Wait for LinuxCNC to initialize itself so the Status buffer stabilizes.
 l.wait_for_linuxcnc_startup()
 
-print "status at boot up"
+print("status at boot up")
 s.poll()
 print_status(s)
 

@@ -18,10 +18,12 @@
 
 
 import gtk
-import gobject
+import gi
+from   gi.repository import GObject as gobject
 import os
 import sys
-import pango
+gi.require_version ('Pango','1.0')
+from   gi.repository import Pango as pango
 import math
 import linuxcnc
 from hal_glib import GStat
@@ -228,7 +230,7 @@ class Combi_DRO(gtk.VBox):
     # Get propertys
     def do_get_property(self, property):
         name = property.name.replace('-', '_')
-        if name in self.__gproperties.keys():
+        if name in list(self.__gproperties.keys()):
             return getattr(self, name)
         else:
             raise AttributeError('unknown property %s' % property.name)
@@ -237,14 +239,14 @@ class Combi_DRO(gtk.VBox):
     def do_set_property(self, property, value):
         try:
             name = property.name.replace('-', '_')
-            if name in self.__gproperties.keys():
+            if name in list(self.__gproperties.keys()):
                 setattr(self, name, value)
                 self.queue_draw()
                 if name in ('mm_text_template', 'imperial_text_template'):
                     try:
                         v = value % 0.0
-                    except Exception, e:
-                        print "Invalid format string '%s': %s" % (value, e)
+                    except Exception as e:
+                        print("Invalid format string '%s': %s" % (value, e))
                         return False
                 if name == "homed_color":
                     self.homed_color = value
@@ -644,9 +646,9 @@ def clicked(self, axis_number, order):
     axis_number = the joint number of the widget
     order = the actual order of the DRO in the widget
     '''
-    print("Click received from ", axis_number)
-    print("Order = ", order)
-    print(self.get_position())
+    print(("Click received from ", axis_number))
+    print(("Order = ", order))
+    print((self.get_position()))
 #    self.set_property("joint_number", 0)
     # other_widget.set_order(order)
     # so they may be mantained consistent

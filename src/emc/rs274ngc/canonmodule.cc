@@ -38,6 +38,7 @@ static void wrap_canon_error(const char *s)
 
 BOOST_PYTHON_MODULE(emccanon) {
     using namespace boost::python;
+fprintf(stderr,"0++++EMCCANON MODULE------------------------------\n");
     scope().attr("__doc__") =
         "Canon access & introspection\n"
         ;

@@ -67,7 +67,7 @@ else:
     wxpos = str(pad_width/2)
     wypos = str(pad_height/2)
 w('wm','geometry','.','{0}x{1}-{2}-{3}'.format(width,height,wxpos,wypos))
-print '\nAxis window is {0} x {1}\n'.format(width,height)
+print('\nAxis window is {0} x {1}\n'.format(width,height))
 
 
 ################################################################################

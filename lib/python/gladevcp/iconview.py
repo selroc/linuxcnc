@@ -29,7 +29,8 @@
 '''
 
 import gtk
-import gobject
+import gi
+from   gi.repository import GObject as gobject
 import os
 import mimetypes
 import gio
@@ -363,8 +364,8 @@ class IconFileSelection(gtk.HBox):
         
     def state_changed(self):
         # find the differnce
-        diff = set(self.button_state.iteritems()) - set(self.old_button_state.iteritems())
-        for key in self.button_state.keys():
+        diff = set(self.button_state.items()) - set(self.old_button_state.items())
+        for key in list(self.button_state.keys()):
             try:
                 if self.button_state[key] != self.old_button_state[key]:
                     self.emit("sensitive",key, self.button_state[key])
@@ -532,7 +533,7 @@ class IconFileSelection(gtk.HBox):
 
     def do_get_property(self, property):
         name = property.name.replace('-', '_')
-        if name in self.__gproperties.keys():
+        if name in list(self.__gproperties.keys()):
             return getattr(self, name)
         else:
             raise AttributeError('unknown iconview get_property %s' % property.name)
@@ -540,7 +541,7 @@ class IconFileSelection(gtk.HBox):
     def do_set_property(self, property, value):
         try:
             name = property.name.replace('-', '_')
-            if name in self.__gproperties.keys():
+            if name in list(self.__gproperties.keys()):
                 setattr(self, name, value)
                 self.queue_draw()
                 if name == 'icon_size':

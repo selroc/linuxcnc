@@ -1,3 +1,4 @@
+#define PY3_WORKAROUND
 /*    This is a component of LinuxCNC
  *    Copyright 2011, 2012 Michael Haberler <git@mah.priv.at>
  *
@@ -80,6 +81,27 @@ std::string handle_pyerror()
     PyObject *exc,*val,*tb;
     object formatted_list, formatted;
     PyErr_Fetch(&exc,&val,&tb);
+/*
+1:PROBLEM in taskclass.cc TASK_VAR is string <pytask>
+          (taskclass module doesnt work in 2.8 branch)
+2:PROBLEM in gcodemodule not sure yet
+
+PY3_WORKAROUND in handle_pyerror() fake msg
+emcTaskOnce: extract(task_instance):    handle_pyerror() workaround msg
+causes task to fail so workaround to keep going to
+work on similar errors with axis/glcanon/gcodemoule new Interp
+
+the workaround is needed for task but disabling prevents seeing
+error for axis/glcanon/gcodemodule
+*/
+
+#undef PY3_WORKAROUND
+#ifdef PY3_WORKAROUND
+    fprintf(stderr,"PY3_WORKAROUND in INTERP_PYTHON:handle_pyerror() fake msg pid=%d\n",(int)getpid());
+    std::string msg = "<this is workaround msg for handle_pyerror()>";
+    return msg;
+    //avoid broken stuff below (task, ok for axis/glcanon/gcodemodule)
+#else
     handle<> hexc(exc),hval(allow_null(val)),htb(allow_null(tb));
     object traceback(import("traceback"));
     if (!tb) {
@@ -91,6 +113,7 @@ std::string handle_pyerror()
     }
     formatted = str("\n").join(formatted_list);
     return extract<std::string>(formatted);
+#endif
 }
 
 int Interp::py_reload()
@@ -214,13 +237,13 @@ int Interp::pycall(setup_pointer settings,
 		    frame->pystuff.impl->py_returned_int = bp::extract<int>(frame->pystuff.impl->generator_next());
 		    frame->pystuff.impl->py_return_type = RET_YIELD;
 		
-		} else if (PyString_Check(retval.ptr())) {  
+		} else if (PyUnicode_Check(retval.ptr())) {  
 		    // returning a string sets the interpreter error message and aborts
 		    char *msg = bp::extract<char *>(retval);
 		    ERM("%s", msg);
 		    frame->pystuff.impl->py_return_type = RET_ERRORMSG;
 		    status = INTERP_ERROR;
-		} else if (PyInt_Check(retval.ptr())) {  
+		} else if (PyLong_Check(retval.ptr())) {  
 		    frame->pystuff.impl->py_returned_int = bp::extract<int>(retval);
 		    frame->pystuff.impl->py_return_type = RET_INT;
 		    logPy("Python call %s.%s returned int: %d", module, funcname, frame->pystuff.impl->py_returned_int);
@@ -234,7 +257,7 @@ int Interp::pycall(setup_pointer settings,
 		    Py_XDECREF(res_str);
 		    ERM("Python call %s.%s returned '%s' - expected generator, int, or float value, got %s",
 			module, funcname,
-			PyString_AsString(res_str),
+			PyBytes_AsString(res_str),
 			retval.ptr()->ob_type->tp_name);
 		    status = INTERP_ERROR;
 		}
@@ -249,7 +272,7 @@ int Interp::pycall(setup_pointer settings,
 	    // a plain int (INTERP_OK, INTERP_ERROR, INTERP_EXECUTE_FINISH...) is expected
 	    // must have returned an int
 	    if ((retval.ptr() != Py_None) &&
-		(PyInt_Check(retval.ptr()))) {
+		(PyLong_Check(retval.ptr()))) {
 
 // FIXME check new return value convention
 		status = frame->pystuff.impl->py_returned_int = bp::extract<int>(retval);
@@ -260,7 +283,7 @@ int Interp::pycall(setup_pointer settings,
 		res_str = PyObject_Str(retval.ptr());
 		ERM("Python internal function '%s' expected tuple or int return value, got '%s' (%s)",
 		    funcname,
-		    PyString_AsString(res_str),
+		    PyBytes_AsString(res_str),
 		    retval.ptr()->ob_type->tp_name);
 		Py_XDECREF(res_str);
 		status = INTERP_ERROR;

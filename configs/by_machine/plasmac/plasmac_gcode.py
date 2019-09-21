@@ -88,7 +88,7 @@ def negative_cutoff(I, J, radius):
         endX = centerX + radius * ((cosB * cosA) - (sinB * sinA))
         endY = centerY + radius * ((sinB * cosA) + (cosB * sinA))
         dir = '3'
-    print('g{0} x{1:0.{5}f} y{2:0.{5}f} i{3:0.{5}f} j{4:0.{5}f}'.format(dir, endX, endY, I, J, precision))
+    print(('g{0} x{1:0.{5}f} y{2:0.{5}f} i{3:0.{5}f} j{4:0.{5}f}'.format(dir, endX, endY, I, J, precision)))
     lastX = endX
     lastY = endY
 
@@ -98,7 +98,7 @@ def get_hole_radius(I, J):
     radius = math.sqrt((I ** 2) + (J ** 2))
     # velocity reduction required
     if radius < (minDiameter / 2 / scale):
-        print('m67 e3 q{0} (radius: {1:0.3f}, velocity: {0}%)'.format(velocity, radius))
+        print(('m67 e3 q{0} (radius: {1:0.3f}, velocity: {0}%)'.format(velocity, radius)))
         holeActive = True
     # no velocity reduction required
     else:
@@ -162,9 +162,9 @@ def comment_out_z_commands():
         else:
             newline += bit
     if holeActive:
-        print 'm67 e3 q0 (arc complete, velocity 100%)'
+        print('m67 e3 q0 (arc complete, velocity 100%)')
         holeActive = False
-    print('{} {})'.format(newline, newz))
+    print(('{} {})'.format(newline, newz)))
 
 # check if math used or explicit values
 def check_math(axis):
@@ -172,12 +172,12 @@ def check_math(axis):
     tmp1 = line.split(axis)[1]
     if tmp1.startswith('[') or tmp1.startswith('#'):
         codeError = True
-        print('*** PlasmaC GCode parser\n'
+        print(('*** PlasmaC GCode parser\n'
               '*** requires explicit values\n'
               'Error in line #{}: {}'
               '*** disable hole sensing\n'
               '*** or edit GCode to suit\n'
-              .format(count, line))
+              .format(count, line)))
 
 # get a list of known materials
 with open(materialFile, 'r') as f_in:
@@ -213,11 +213,11 @@ for line in fRead:
         # if invalid material number
         if int(material) not in materialList:
             codeError = True
-            print('*** The following materials are missing from:\n'
+            print(('*** The following materials are missing from:\n'
                   '*** {}\n'
                   '*** Material #{}\n'
                   'Error in line #{}: {}\n'
-                  .format(materialFile, material, count, line))
+                  .format(materialFile, material, count, line)))
     # set units
     if 'g21' in line:
         scale, precision = metric
@@ -236,17 +236,17 @@ for line in fRead:
         # if unsupported distance mode
         if 'g91' in line and not 'g91.1' in line:
             codeError = True
-            print('*** PlasmaC GCode parser only\n'
+            print(('*** PlasmaC GCode parser only\n'
                   '*** supports Distance Mode G90\n'
                   'Error in line #{}: {}\n'
-                  .format(count, line))
+                  .format(count, line)))
         # if unsupported arc distance mode
         if 'g90.1' in line:
             codeError = True
-            print('*** PlasmaC GCode parser only\n'
+            print(('*** PlasmaC GCode parser only\n'
                   '*** supports Arc Distance Mode G91.1\n'
                   'Error in line #{}: {}\n'
-                  .format(count, line))
+                  .format(count, line)))
         if 'x' in line: check_math('x')
         if 'y' in line: check_math('y')
         if 'i' in line: check_math('i')
@@ -254,18 +254,18 @@ for line in fRead:
         if '_diameter>' in line:
             if not line.startswith('#<m_d') and not line.startswith('#<i_d'):
                 codeError = True
-                print('*** invalid diameter word\n'
+                print(('*** invalid diameter word\n'
                       'Error in line #{}: {}\n'
-                      .format(count, line))
+                      .format(count, line)))
     if (line.startswith('#<pierce-only>') and line.split('=')[1][0] == '1') or cutType == 1:
         pierceOnly = True
     if line.startswith('m3$1s'):
         scribing = True
     if pierceOnly and scribing:
         codeError = True
-        print('*** air-scribe is invalid for pierce only mode\n'
+        print(('*** air-scribe is invalid for pierce only mode\n'
               'Error in line #{}: {}\n'
-              .format(count, line))
+              .format(count, line)))
         scribing = False
 
 # second pass, process every line
@@ -292,7 +292,7 @@ if not codeError:
                         break
             # if a commented line then print it and get next line
             if line.startswith(';') or line.startswith('('):
-                print line
+                print(line)
                 continue
             # if a ; comment at end of line preprocess it
             elif ';' in line:
@@ -309,14 +309,14 @@ if not codeError:
             if line.startswith('#<holes>'):
                 if line.split('=')[1].replace(' ','')[0] == '2':
                     holeEnable = overCut = True
-                    print('{} (overcut for holes)'.format('#<holes> = 2'))
+                    print(('{} (overcut for holes)'.format('#<holes> = 2')))
                 elif line.split('=')[1].replace(' ','')[0] == '1':
                     holeEnable = True
                     overCut = False
-                    print('{} (velocity reduction for holes)'.format('#<holes> = 1'))
+                    print(('{} (velocity reduction for holes)'.format('#<holes> = 1')))
                 else:
                     holeEnable = overCut = False
-                    print('{} (disable hole sensing)'.format('#<holes> = 0'))
+                    print(('{} (disable hole sensing)'.format('#<holes> = 0')))
             # if diameter command
             elif '_diameter>' in line:
                 if line.startswith('#<i_d'):
@@ -333,7 +333,7 @@ if not codeError:
             # if z axis in line but no other axes comment it
             elif 'z' in line and 1 not in [c in line for c in 'xyabcuvw'] and\
                  line.split('z')[1][0].isdigit():
-                print('({})'.format(line))
+                print(('({})'.format(line)))
             # if z axis and other axes in line, comment out the Z axis
             elif 'z' in line and line.split('z')[1][0].isdigit():
                 if holeEnable:
@@ -417,7 +417,7 @@ if not codeError:
         for line in fRead:
             if spindleOn:
                 pierces += 1
-                print('\n(Pierce #{})'.format(pierces))
+                print(('\n(Pierce #{})'.format(pierces)))
                 print(rapidLine)
                 print('M3 $0 S1')
                 print('G91')
@@ -440,5 +440,5 @@ if not codeError:
                 spindleOn = True
         print('')
         if rapidLine:
-            print('{}'.format(rapidLine))
+            print(('{}'.format(rapidLine)))
         print('M30 (END)')

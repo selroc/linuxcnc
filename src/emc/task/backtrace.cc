@@ -56,9 +56,10 @@ void backtrace(int signo)
 	} else {
 	    // this takes emcmodule.cc:EMC_COMMAND_TIMEOUT seconds to display:
 	    if (status == 0) // backtrace succeeded
-		emcOperatorError(0, "%s (pid %d) died on signal %d, backtrace stored in %s",
+		emcOperatorError(0, "%s (pid %d) died on signal %d"
+                            "backtrace stored in:\n   %s",
 				 name_buf, getpid(), signo, filename);
-	    fprintf(stderr, "%s exiting\n", name_buf);
+	    fprintf(stderr, "\n%s EXITING\n", name_buf);
 	    done = 1;  // signal task to exit main loop
 	}
     }

@@ -36,7 +36,7 @@ def get_bits(f, o=0):
     elif o == 'EV_LED': fmap, rmap, prefix = LED_invert, LED, "LED"
     elif o == 'EV_ABS': fmap, rmap, prefix = ABS_invert, ABS, "ABS"
     elif o == 'EV_REL': fmap, rmap, prefix = REL_invert, REL, "REL"
-    else: raise ValueError, "get_bits: unexpected map %s" % o
+    else: raise ValueError("get_bits: unexpected map %s" % o)
 
     sz = max(fmap) + 1
     a = fcntl.ioctl(f, SZ(EVIOCGBIT+EV[o], sz), '\0' * ((sz+7)/8))
@@ -751,7 +751,7 @@ EVIOCGEFFECTS        = i(0x80044584)
 EVIOCGRAB            = 0x40044590
 
 def invert(d):
-    return dict((v,k) for k,v in d.iteritems())
+    return dict((v,k) for k,v in d.items())
 ABS_invert = invert(ABS)
 BTN_invert = invert(BTN)
 BUS_invert = invert(BUS)
@@ -768,7 +768,7 @@ def humanize(s):
     def maybe_int(ss):
         if ss and ss[0] in "0123456789": return int(ss)
         return ss
-    return map(maybe_int, s)
+    return list(map(maybe_int, s))
 
 def find(pattern):
     if ":" in pattern:
@@ -829,11 +829,11 @@ def find(pattern):
 
 	os.close(f)
     if not successful_opens:
-        raise LookupError, """\
+        raise LookupError("""\
 No input devices could be opened.  This usually indicates a misconfigured
 system.  Please read the section 'PERMISSIONS AND UDEV' in the hal_input
-manpage"""
-    raise LookupError, (
+manpage""")
+    raise LookupError(
         "No input device matching %r was found (%d devices checked)" 
             % (pattern, successful_opens))
 

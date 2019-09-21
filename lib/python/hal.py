@@ -64,8 +64,11 @@ class Param(_ItemWrap):
             raise TypeError("Must be constructed from param object")
 
 class component(_hal.component):
-    def newpin(self, *a, **kw): return Pin(_hal.component.newpin(self, *a, **kw))
+    def newpin(self, *a, **kw):
+        aa=(a[0],a[1],a[2])
+        return Pin(_hal.component.newpin(self, *aa, **kw))
     def newparam(self, *a, **kw): return Param(_hal.component.newparam(self, *a, **kw))
 
-    def getpin(self, *a, **kw): return Pin(_hal.component.getpin(self, *a, **kw))
+    def getpin(self, *a, **kw): 
+        return Pin(_hal.component.getpin(self, *a, **kw))
     def getparam(self, *a, **kw): return Param(_hal.component.getparam(self, *a, **kw))

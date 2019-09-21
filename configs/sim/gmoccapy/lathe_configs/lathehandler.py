@@ -51,7 +51,7 @@ class HandlerClass:
 
     # This catches our messages from another program
     def event(self,w,event):
-        print event.message_type,event.data
+        print(event.message_type,event.data)
         if event.message_type == 'Gladevcp':
             if event.data[:7] == 'Visible':
                 self.active = True
@@ -61,7 +61,7 @@ class HandlerClass:
     # We connect to client-events from the new toplevel widget
     def on_map_event(self, widget, data=None):
         top = widget.get_toplevel()
-        print "map event"
+        print("map event")
         top.connect('client-event', self.event)
 
     def on_destroy(self,obj,data=None):
@@ -175,10 +175,10 @@ class HandlerClass:
     def cycle_pin(self, pin, data = None):
         if pin.get() == 0:
             return
-        print 'cycle pin'
+        print('cycle pin')
         if self.active:
             nb = self.builder.get_object('tabs1')
-            print 'current tab', nb.get_current_page()
+            print('current tab', nb.get_current_page())
             tab = nb.get_nth_page(nb.get_current_page())
             for c in tab.get_children():
                 if c.name.partition('.')[2] == 'action':
@@ -188,13 +188,13 @@ class HandlerClass:
                     c.emit('clicked')
 
     def gash(self, obj, data = None):
-        print 'event', data
+        print('event', data)
 
 def get_handlers(halcomp,builder,useropts):
 
     global debug
     for cmd in useropts:
-        exec cmd in globals()
+        exec(cmd, globals())
 
     set_debug(debug)
     return [HandlerClass(halcomp,builder,useropts)]

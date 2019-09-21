@@ -20,13 +20,14 @@
 # GNU General Public License for more details.
 
 import gtk
-import gobject
+import gi
+from   gi.repository import GObject as gobject
 from math import pi
 import hal
 
 # This is needed to make the hal pin, making them directly with hal, will
 # not allow to use them in glade without linuxcnc beeing started
-from hal_widgets import _HalSpeedControlBase
+from .hal_widgets import _HalSpeedControlBase
 
 class SpeedControl(gtk.VBox, _HalSpeedControlBase):
     '''
@@ -396,12 +397,12 @@ class SpeedControl(gtk.VBox, _HalSpeedControlBase):
     # Get properties
     def do_get_property(self, property):
         name = property.name.replace('-', '_')
-        if name in self.__gproperties.keys():
+        if name in list(self.__gproperties.keys()):
             if name == 'color':
                 col = getattr(self, name)
                 colorstring = col.to_string()
-                print("col = ",col)
-                print("colorstring = ",colorstring)
+                print(("col = ",col))
+                print(("colorstring = ",colorstring))
                 return getattr(self, name)
             return getattr(self, name)
         else:
@@ -411,7 +412,7 @@ class SpeedControl(gtk.VBox, _HalSpeedControlBase):
     def do_set_property(self, property, value):
         try:
             name = property.name.replace('-', '_')
-            if name in self.__gproperties.keys():
+            if name in list(self.__gproperties.keys()):
                 setattr(self, name, value)
                 if name == "height":
                     self._size = value

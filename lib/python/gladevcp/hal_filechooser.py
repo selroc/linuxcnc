@@ -17,15 +17,17 @@
 import os, sys, time, select, re
 import tempfile, atexit, shutil
 
-import gtk, gobject
+import gtk
+import gi
+from   gi.repository import GObject as gobject
 
-from hal_widgets import _HalWidgetBase
+from .hal_widgets import _HalWidgetBase
 import linuxcnc
 from hal_glib import GStat
 
 _ = lambda x: x
 
-from hal_actions import _EMC_ActionBase, _EMC_Action
+from .hal_actions import _EMC_ActionBase, _EMC_Action
 
 progress_re = re.compile("^FILTER_PROGRESS=(\\d*)$")
 class FilterProgram:
@@ -145,14 +147,14 @@ class _EMC_FileChooser(_EMC_ActionBase):
             #print "New filter %s: %s" % (n, el)
             p = gtk.FileFilter()
             p.set_name(n)
-            map(lambda s: p.add_pattern('*' + s), el)
+            list(map(lambda s: p.add_pattern('*' + s), el))
             #print p
             return p
         all_extensions = [".ngc"]
         extensions = inifile.findall("FILTER", "PROGRAM_EXTENSION")
         extensions = [e.split(None, 1) for e in extensions]
         extensions = tuple([(v, tuple(k.split(","))) for k, v in extensions])
-        map(lambda t: all_extensions.extend(t[1]), extensions)
+        list(map(lambda t: all_extensions.extend(t[1]), extensions))
         self.add_filter(_e2p("All machinable files", all_extensions))
         self.add_filter(_e2p("rs274ngc files", ['.ngc']))
         for n,e in extensions:

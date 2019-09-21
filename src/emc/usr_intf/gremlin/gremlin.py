@@ -42,8 +42,10 @@ import gtk.gdkgl
 import gtk.gdk
 
 import glnav
-import gobject
-import pango
+import gi
+gi.require_version ('Pango','1.0')
+from   gi.repository import Pango as pango
+from   gi.repository import GObject as gobject
 
 import rs274.glcanon
 import rs274.interpret
@@ -57,7 +59,7 @@ import shutil
 import os
 import sys
 
-import thread
+import _thread
 
 from minigl import *
 
@@ -104,7 +106,7 @@ class Gremlin(gtk.gtkgl.widget.DrawingArea, glnav.GlNavBase,
             C('backplotprobing'),
             self.get_geometry()
         )
-        thread.start_new_thread(self.logger.start, (.01,))
+        _thread.start_new_thread(self.logger.start, (.01,))
 
         rs274.glcanon.GlCanonDraw.__init__(self, linuxcnc.stat(), self.logger)
 
@@ -233,7 +235,7 @@ class Gremlin(gtk.gtkgl.widget.DrawingArea, glnav.GlNavBase,
         self._current_file = None
 
         self.font_base, width, linespace = \
-		glnav.use_pango_font('courier bold 16', 0, 128)
+                glnav.use_pango_font('courier bold 16', 0, 128)
         self.font_linespace = linespace
         self.font_charwidth = width
         rs274.glcanon.GlCanonDraw.realize(self)
@@ -455,9 +457,9 @@ class Gremlin(gtk.gtkgl.widget.DrawingArea, glnav.GlNavBase,
 
     def report_gcode_error(self, result, seq, filename):
 
-	error_str = gcode.strerror(result)
-	sys.stderr.write("G-Code error in " + os.path.basename(filename) + "\n" + "Near line "
-	                 + str(seq) + " of\n" + filename + "\n" + error_str + "\n")
+        error_str = gcode.strerror(result)
+        sys.stderr.write("G-Code error in " + os.path.basename(filename) + "\n" + "Near line "
+                         + str(seq) + " of\n" + filename + "\n" + error_str + "\n")
 
     # These are for external controlling of the view
 

@@ -23,22 +23,22 @@ class HandlerClass:
 
         else:
             state = 'inactive'
-        print '   %s button toggled - now %s ' % ( widget.get_label(), state)
+        print('   %s button toggled - now %s ' % ( widget.get_label(), state))
 
     def on_red_rbtn_toggled(self, widget, data=None):
-        print 'on_red_rbtn_toggled'
+        print('on_red_rbtn_toggled')
         self.print_radiobutton_state(widget)
 
     def on_blue_rbtn_toggled(self, widget, data=None):
-        print 'on_blue_rbtn_toggled'
+        print('on_blue_rbtn_toggled')
         self.print_radiobutton_state(widget)
 
     def on_green_rbtn_toggled(self, widget, data=None):
-        print 'on_green_rbtn_toggled'
+        print('on_green_rbtn_toggled')
         self.print_radiobutton_state(widget)
 
     def on_yellow_rbtn_toggled(self, widget, data=None):
-        print 'on_yellow_rbtn_toggled'
+        print('on_yellow_rbtn_toggled')
         self.print_radiobutton_state(widget)
 
     def on_showoutput_btn_toggled(self, widget, data=None):
@@ -53,7 +53,7 @@ class HandlerClass:
         self.color_lbl.modify_fg(gtk.STATE_NORMAL, mycolor)
 
     def on_destroy(self,obj,data=None):
-        print "on_destroy"
+        print("on_destroy")
         self.halcomp.exit() # avoid lingering HAL component
         gtk.main_quit()
 
@@ -80,7 +80,7 @@ def get_handlers(halcomp,builder,useropts):
 
     global debug
     for cmd in useropts:
-        exec cmd in globals()
+        exec(cmd, globals())
 
     return [HandlerClass(halcomp,builder,useropts)]
 

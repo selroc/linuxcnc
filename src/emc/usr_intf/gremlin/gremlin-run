@@ -22,7 +22,7 @@ class GremlinApp(gtk.Window):
 
         try:
             inifile = linuxcnc.ini(inifile)
-        except linuxcnc.error,detail:
+        except linuxcnc.error as detail:
             usage('Using filename = %s\n %s' % (inifile,detail))
 
         gtk.Window.__init__(self)
@@ -39,11 +39,11 @@ class GremlinApp(gtk.Window):
 
 
 def usage(msg=None):
-    print('Usage: %s inifilename' % sys.argv[0])
-    print('   or: %s              (requires environmental variable INI_FILE_NAME)'
-         % sys.argv[0])
+    print(('Usage: %s inifilename' % sys.argv[0]))
+    print(('   or: %s              (requires environmental variable INI_FILE_NAME)'
+         % sys.argv[0]))
     if msg:
-        print('\n%s' % msg)
+        print(('\n%s' % msg))
 
 
     sys.exit(1)
@@ -59,4 +59,4 @@ def main():
     g = GremlinApp(inifilename)
     gtk.main()
 
-if __name__ == '__main__': raise SystemExit, main()
+if __name__ == '__main__': raise SystemExit(main())

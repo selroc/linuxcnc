@@ -33,4 +33,4 @@ for i in range(9):
 assert reader.read() is None
 assert reader.num_underruns == 1
 
-print "pass"
+print("pass")

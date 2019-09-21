@@ -39,6 +39,16 @@
 
 #include <saicanon.hh>
 
+//PY3fix add gdb backtrace capability
+using namespace boost;
+using namespace boost::python;
+
+// for gdb backtrace (as in task)
+#include <signal.h>
+extern void backtrace(int signo); 
+extern void setup_signal_handlers();
+int    done; // notused herein, reqd by backtrace.cc
+
 InterpBase *pinterp;
 #define interp_new (*pinterp)
 const char *prompt = "READ => ";
@@ -550,6 +560,11 @@ int main (int argc, char ** argv)
   int log_level = -1;
   std::string interp;
 
+  // create a backtrace (like task)
+  signal(SIGSEGV, backtrace);
+  signal(SIGFPE, backtrace);
+  signal(SIGUSR1, backtrace);
+
   do_next = 2;  /* 2=stop */
   block_delete = OFF;
   print_stack = OFF;
@@ -600,7 +615,6 @@ usage:
             , argv[0]);
       exit(1);
     }
-
   if(!interp.empty()) {
     pinterp = interp_from_shlib(interp.c_str());
   }

@@ -3292,6 +3292,9 @@ int main(int argc, char *argv[])
     int latency_excursion_factor = 10;  // if latency is worse than (factor * expected), it's an excursion
     double minTime, maxTime;
 
+    int max_latency_warnings = 10;
+    if (getenv("QUIET")) max_latency_warnings=1; //PY3 testing
+
     bindtextdomain("linuxcnc", EMC2_PO_DIR);
     setlocale(LC_MESSAGES,"");
     setlocale(LC_CTYPE,"");
@@ -3576,7 +3579,7 @@ int main(int argc, char *argv[])
             maxTime = deltaTime;
         startTime = endTime;
         if (deltaTime > (latency_excursion_factor * emc_task_cycle_time)) {
-            if (num_latency_warnings < 10) {
+            if (num_latency_warnings < max_latency_warnings) {
                 rcs_print("task: main loop took %.6f seconds\n", deltaTime);
             }
             num_latency_warnings ++;

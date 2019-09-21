@@ -56,7 +56,7 @@ class HandlerClass:
 
     def on_diameter_mode_pressed(self, widget):
         data = widget.get_active()
-        print "switch diam mode",data
+        print("switch diam mode",data)
         self.gscreen.set_diameter_mode(data)
         for i in ("1","2","3"):
             axis = "dro_x%s"% (i)
@@ -68,7 +68,7 @@ class HandlerClass:
     # This is a new method for our button
     # we selected this method name in the glade file as a signal callback 
     def on_estop_clicked(self,*args):
-        print "estop"
+        print("estop")
         if self.data.estopped:
             self.emc.estop_reset(1)
             self.gscreen.add_alarm_entry("Machine Estop Reset")

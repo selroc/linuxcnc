@@ -21,9 +21,12 @@
 
 import os
 import gtk
-import gobject
-import pango
-import hal_actions
+import gi
+from   gi.repository import GObject as gobject
+gi.require_version ('Pango','1.0')
+from   gi.repository import Pango as pango
+
+from . import hal_actions
 import pyngcgui
 g_module = os.path.basename(__file__)
 #-----------------------------------------------------------------------------
@@ -84,7 +87,7 @@ class PyNgcGui(gtk.Frame,hal_actions._EMC_ActionBase):
 
         # put default property values in self.property_dict[]
         self.property_dict = {}
-        for name in self.__gproperties.keys():
+        for name in list(self.__gproperties.keys()):
             gtype = self.__gproperties[name][0]
             if (   gtype == gobject.TYPE_BOOLEAN
                 or gtype == gobject.TYPE_STRING):
@@ -97,7 +100,7 @@ class PyNgcGui(gtk.Frame,hal_actions._EMC_ActionBase):
 
     def do_get_property(self,property):
         name = property.name.replace('-', '_')
-        if name in self.property_dict.keys():
+        if name in list(self.property_dict.keys()):
             return self.property_dict[name]
         else:
             raise AttributeError(_('%s:unknown property %s')
@@ -105,10 +108,8 @@ class PyNgcGui(gtk.Frame,hal_actions._EMC_ActionBase):
 
     def do_set_property(self,property,value):
         name = property.name.replace('-','_')
-        if name not in self.__gproperties.keys():
-            raise(AttributeError
-                 ,_('%s:pyngcgui:do_set_property: unknown <%s>')
-                 % (g_module,name))
+        if name not in list(self.__gproperties.keys()):
+            raise AttributeError
         else:
             pyngcgui.vprint('SET P[%s]=%s' % (name,value))
             self.property_dict[name] = value
@@ -152,8 +153,8 @@ class PyNgcGui(gtk.Frame,hal_actions._EMC_ActionBase):
         elif send_function_name == 'send_to_axis': send_function = pyngcgui.send_to_axis
         elif send_function_name == 'default_send': send_function = pyngcgui.default_send
         else:
-            print(_('%s:unknown send_function<%s>')
-                  % (g_module,send_function_name))
+            print((_('%s:unknown send_function<%s>')
+                  % (g_module,send_function_name)))
 
         if control_font_name is not None:
            control_font = pango.FontDescription(control_font_name)

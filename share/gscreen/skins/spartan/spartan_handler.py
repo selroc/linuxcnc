@@ -152,15 +152,15 @@ class HandlerClass:
             self.widgets.led_estop.set_active(True)
 
     def on_x_enc_fault(self,hal_object):
-        print"X Encoder Fault"
+        print("X Encoder Fault")
         self.gscreen.add_alarm_entry(_("X Axis Encoder Error"))
         
     def on_y_enc_fault(self,hal_object):
-        print"Y Encoder Fault"
+        print("Y Encoder Fault")
         self.gscreen.add_alarm_entry(_("Y Axis Encoder Error"))
         
     def on_z_enc_fault(self,hal_object):
-        print"Z Encoder Fault"
+        print("Z Encoder Fault")
         self.gscreen.add_alarm_entry(_("Z Axis Encoder Error"))
 
     def homing(self,*args):
@@ -223,7 +223,7 @@ class HandlerClass:
 
     def jog_point1(self,widget):
         if self.data.mode_order[0] == self.data._MAN: # if in manual mode
-                print "jog point1"
+                print("jog point1")
                 if widget == self.widgets.jog_plus:
                     self.do_jog(True,True)
                 else:
@@ -235,7 +235,7 @@ class HandlerClass:
         # jog positive  at selected rate
         if self.data.mode_order[0] == self.data._MAN:
             if len(self.data.active_axis_buttons) > 1:
-                print self.data.active_axis_buttons
+                print(self.data.active_axis_buttons)
             elif self.data.active_axis_buttons[0][0] == None:
                 self.gscreen.homed_status_message = self.widgets.statusbar1.push(1,"No axis selected to jog")
             else:
@@ -257,7 +257,7 @@ class HandlerClass:
             self.mode_changed(self.data.mode_order[0])
 
     def mode_changed(self,mode):
-        print "Mode Change", mode
+        print("Mode Change", mode)
         if mode == self.data._MAN:
             self.widgets.notebook_mode.hide()
             self.widgets.hal_mdihistory.hide()
@@ -305,7 +305,7 @@ class HandlerClass:
             c = h['change-tool']
             n = h['tool-number']
             cd = h['tool-changed']
-            print "tool change",c,cd,n
+            print("tool change",c,cd,n)
             if c:
                 message =  _("Please change to tool # %s, then click OK."% n)
                 self.gscreen.warning_dialog(message, True,pinname="TOOLCHANGE")
@@ -325,7 +325,7 @@ class HandlerClass:
             self.widgets.search_box.hide()
 
     def edit_mode(self,data):
-        print "edit mode pressed",data
+        print("edit mode pressed",data)
         self.gscreen.sensitize_widgets(self.data.sensitive_edit_mode,not data)
         if data:
             self.widgets.mode6.show()
@@ -353,7 +353,7 @@ class HandlerClass:
             self.widgets.button_man_spindle.set_label("Stop")
             self.emc.spindle_forward(1,self.data.spindle_start_rpm)
         else:
-            print "Spindle stop"
+            print("Spindle stop")
             self.widgets.button_man_spindle.set_label("Start")
             self.emc.spindle_off(1)
 
@@ -374,7 +374,7 @@ class HandlerClass:
             view = self.data.view
         else:
             view = 0
-        print "view", view
+        print("view", view)
         if view == 0:
             # Gremlin + Gcode + DRO
             self.data.full_graphics = False

@@ -56,15 +56,15 @@ def lineno():
 
 def error_stack(self):
     """ print the Interpreters error stack (function names) """
-    print "error stack level=%d" % (self.stack_index)
+    print("error stack level=%d" % (self.stack_index))
     for s in self.stack():
-        print "--'%s'" % (s)
+        print("--'%s'" % (s))
 
 def callstack(self):
     """ print the O-Word call stack """
     for i in range(self.call_level):
         c = self.sub_context[i]
-        print "%d: pos=%d seq=%d filename=%s sub=%s" % (i,c.position, c.sequence_number,c.filename,c.subname)
+        print("%d: pos=%d seq=%d filename=%s sub=%s" % (i,c.position, c.sequence_number,c.filename,c.subname))
         
 
    

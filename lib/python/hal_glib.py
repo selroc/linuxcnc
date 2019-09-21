@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # vim: sts=4 sw=4 et
 
-import _hal, hal, gobject
+import _hal, hal
+import gi
+from   gi.repository import GObject as gobject
 import linuxcnc
 import os
 import math
@@ -47,7 +49,7 @@ class GPin(gobject.GObject, hal.Pin):
                 p.update()
             except:
                 kill.append(p)
-                print "Error updating pin %s; Removing" % p
+                print("Error updating pin %s; Removing" % p)
         for p in kill:
             self.REGISTRY.remove(p)
         return self.UPDATE
@@ -842,26 +844,6 @@ class _GStat(gobject.GObject):
     def is_auto_paused(self):
         return self.old['paused']
 
-    def is_interp_running(self):
-        self.stat.poll()
-        return self.stat.interp_state != linuxcnc.INTERP_IDLE
-
-    def is_interp_paused(self):
-        self.stat.poll()
-        return self.stat.interp_state == linuxcnc.INTERP_PAUSED
-
-    def is_interp_reading(self):
-        self.stat.poll()
-        return self.stat.interp_state == linuxcnc.INTERP_READING
-
-    def is_interp_waiting(self):
-        self.stat.poll()
-        return self.stat.interp_state == linuxcnc.INTERP_WAITING
-
-    def is_interp_idle(self):
-        self.stat.poll()
-        return self.stat.interp_state == linuxcnc.INTERP_IDLE
-
     def is_file_loaded(self):
         self.stat.poll()
         if self.stat.file:
@@ -940,19 +922,19 @@ class _GStat(gobject.GObject):
             return JOGJOINT
         if self.stat.motion_mode == linuxcnc.TRAJ_MODE_TELEOP:
             return JOGTELEOP
-        print "commands.py: unexpected motion_mode",self.stat.motion_mode
+        print("commands.py: unexpected motion_mode",self.stat.motion_mode)
         return JOGTELEOP
 
     def jnum_for_axisnum(self,axisnum):
         if self.stat.kinematics_type != linuxcnc.KINEMATICS_IDENTITY:
-            print ("\n%s:\n  Joint jogging not supported for"
-                   "non-identity kinematics"%__file__)
+            print(("\n%s:\n  Joint jogging not supported for"
+                   "non-identity kinematics"%__file__))
             return -1 # emcJogCont() et al reject neg joint/axis no.s
         jnum = trajcoordinates.index( "xyzabcuvw"[axisnum] )
         if jnum > jointcount:
-            print ("\n%s:\n  Computed joint number=%d for axisnum=%d "
+            print(("\n%s:\n  Computed joint number=%d for axisnum=%d "
                    "exceeds jointcount=%d with trajcoordinates=%s"
-                   %(__file__,jnum,axisnum,jointcount,trajcoordinates))
+                   %(__file__,jnum,axisnum,jointcount,trajcoordinates)))
             # Note: primary gui should protect for this misconfiguration
             # decline to jog
             return -1 # emcJogCont() et al reject neg joint/axis no.s

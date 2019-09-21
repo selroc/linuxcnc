@@ -17,6 +17,24 @@
 # Copyright (c) 2004-2009 All rights reserved.
 ################################################################################
 
+PYTHONVERSION=$(python --version 2>&1) #: typ "Python a.b.c"
+PYV=${PYTHONVERSION##Python}      # strip leading "Python"
+PYV=${PYV%%.*}                    # strip trailing ".b.c"
+if [ $PYV -lt 3 ] ; then
+  echo "This <$0> is for testing Python3 but your version is: $PYTHONVERSION"
+  echo ""
+  echo "update-alternatives --display python"
+  update-alternatives --display python
+  echo ""
+  echo "To change, try: $ sudo update-alternatives -config python"
+  echo "For more info: man update-alternatives"
+  exit 1
+else
+  echo "This <$0> is for testing Python3"
+  echo "Using: $PYTHONVERSION"
+fi
+
+
 # -1. Get all rip-environment items if we are RIP
 if test "xyes" = "x@RUN_IN_PLACE@"; then
     if test "${EMC2_HOME:-}" != "@EMC2_HOME@"; then

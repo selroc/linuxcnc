@@ -73,6 +73,7 @@ include an option for suppressing superfluous commands.
 #include <boost/python/list.hpp>
 #include <boost/python/scope.hpp>
 #include <boost/python/tuple.hpp>
+#include <boost/python/exec.hpp> //dng
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -108,6 +109,9 @@ using namespace interp_param_global;
 namespace bp = boost::python;
 
 extern char * _rs274ngc_errors[];
+extern int _task; //for reporting
+
+extern struct _inittab builtin_modules[];
 
 const char *Interp::interp_status(int status) {
     static char statustext[50];
@@ -130,18 +134,37 @@ Interp::Interp()
 {
     _setup.init_once = 1;  
   init_named_parameters();  // need this before Python init.
- 
+
+#if 0
+if (_task==1) {
+  fprintf(stderr,"_task==1 skippingggggggggg  Interp::Interp\n");
+  return;
+}
+#endif
+
+#if 0
+#include "interp_tests" // for PY3testing
+#endif
+
+  fprintf(stderr,"RS274NGC_PRE: plugin instantiate builtin_modules _task=%d pid=%d\n",
+           _task,(int)getpid());
+
   if (!PythonPlugin::instantiate(builtin_modules)) {  // factory
-    Error("Interp ctor: cant instantiate Python plugin");
+    Error("Interp ctor: cant instantiate Python plugin pid=%d",getpid() );
     return;
   }
 
 // KLUDGE just to get unit tests to stop complaining about python modules we won't use anyway
 #ifndef UNIT_TEST
   try {
+    //PY3 below fails for _task=0, succeeds for _task=1
+    fprintf(stderr,"RS274NGC_PRE import(\"interpreter\") _task=%d pid=%d\n",
+           _task,(int)getpid());
     // this import will register the C++->Python converter for Interp
     bp::object interp_module = bp::import("interpreter");
-	
+    fprintf(stderr,"RS274NGC_PRE OK import(\"interpreter\") _task=%d\n\n",_task);
+
+
     // use a boost::cref to avoid per-call instantiation of the
     // Interp Python wrapper (used for the 'self' parameter in handlers)
     // since interp.init() may be called repeatedly this would create a new
@@ -161,12 +184,19 @@ Interp::Interp()
   catch (bp::error_already_set) {
     std::string exception_msg;
     if (PyErr_Occurred()) {
+      fprintf(stderr,"RS274NGC_PRE PyErr_Occurred\n");
       exception_msg = handle_pyerror();
-    } else
+    } else {
+      fprintf(stderr,"\n1_RS274NGC_PRE unknown exception\n");
       exception_msg = "unknown exception";
+    }
     bp::handle_exception();
     PyErr_Clear();
-    Error("PYTHON: exception during 'this' export:\n%s\n",exception_msg.c_str());
+    Error("RS274NGC_PRE PYTHON: exception during 'this' (\"interpreter\") import:\n"
+          "        %s"
+          "        _task=%d (%s)\n",
+          exception_msg.c_str(),
+          _task,_task?"task":"gcodemodule");
   }
 #endif
 }
@@ -995,7 +1025,14 @@ int Interp::init()
           if (NULL != (inistring = inifile.Find("TOPLEVEL", "PYTHON"))) {
 	      int status = python_plugin->configure(iniFileName,"PYTHON");
 	      if (status != PLUGIN_OK) {
-		  Error("Python plugin configure() failed, status = %d", status);
+                  const char* msg = "Other";
+                  switch (status) { // status can be negative too
+                       PLUGIN_NO_CALLABLE:     msg="NO_CALLABLE";break;
+                       PLUGIN_EXCEPTION:       msg="EXCEPTION"  ;break;
+                  }
+                  if (status==PLUGIN_INIT_EXCEPTION) { msg="INIT_EXCEPTION";}
+		  Error("\nPPPython plugin configure() failed, status = %d %s",
+                  status,msg);
 	      }
 	  }
  

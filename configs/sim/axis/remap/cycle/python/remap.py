@@ -69,7 +69,7 @@ def g842(self,**words):
     _sticky_params[r.name].update(words) 
 
     # insert your cycle actions here
-    for (key,value) in _sticky_params[r.name].items():
+    for (key,value) in list(_sticky_params[r.name].items()):
         text += "%s%.1f " % (key, value)
     MESSAGE(text)
 

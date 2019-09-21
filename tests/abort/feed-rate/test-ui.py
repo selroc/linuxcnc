@@ -66,7 +66,7 @@ c.wait_complete()
 c.abort()
 c.wait_complete()
 s.poll()
-print "feed rate:", s.settings[1]
+print("feed rate:", s.settings[1])
 assert(math.fabs(s.settings[1] - feed_rate) < 0.0000001)
 
 feed_rate = 345.6
@@ -76,7 +76,7 @@ c.wait_complete()
 c.abort()
 c.wait_complete()
 s.poll()
-print "feed rate:", s.settings[1]
+print("feed rate:", s.settings[1])
 assert(math.fabs(s.settings[1] - feed_rate) < 0.0000001)
 
 sys.exit(0)

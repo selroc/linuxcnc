@@ -1,4 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2.7
+
+# PY3 The buster package python-lxml is not python3-aware
+# PY3 so we set python2.7 above
+
 # vim: sts=4 sw=4 et
 
 import os, shutil, sys, subprocess
@@ -75,7 +79,7 @@ def substitute(f):
     for e in xml.xpath('//div[@class="latexmath"]', namespaces=nsmap):
         images += build_img(f, e, block=True)
     if not images: return
-    print "Added %d images" % images
+    print("Added %d images" % images)
     fp = open(f + ".math", 'w')
     fp.write(ET.tostring(xml, pretty_print=True, xml_declaration=False, encoding="utf-8"))
     fp.close()

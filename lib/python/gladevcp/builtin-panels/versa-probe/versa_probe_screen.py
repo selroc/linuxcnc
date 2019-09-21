@@ -19,21 +19,24 @@ import gtk                  # base for pygtk widgets and constants
 import gtk.glade
 import sys                  # handle system calls
 import linuxcnc             # to get our own error sytsem
-import gobject              # needed to add the timer for periodic
+import gi
+from   gi.repository import GObject as gobject # needed to add the timer for periodic
 import pygtk
 import gladevcp
-import pango
+import gi
+gi.require_version ('Pango','1.0')
+from   gi.repository import Pango as pango
 import time
 import math
 from linuxcnc import ini
-import ConfigParser
+import configparser
 from datetime import datetime
 from subprocess import Popen, PIPE
 
 CONFIGPATH1 = os.environ['CONFIG_DIR']
 
 
-cp1 = ConfigParser.RawConfigParser
+cp1 = configparser.RawConfigParser
 class ps_preferences(cp1):
     types = {
         bool: cp1.getboolean,
@@ -54,8 +57,8 @@ class ps_preferences(cp1):
         m = self.types.get(type)
         try:
             o = m(self, "DEFAULT", option)
-        except Exception, detail:
-            print detail
+        except Exception as detail:
+            print(detail)
             self.set("DEFAULT", option, default)
             self.write(open(self.fn, "w"))
             if type in(bool, float, int):
@@ -82,14 +85,14 @@ class ProbeScreenClass:
             else:
                 machinename = machinename.replace(" ", "_")
                 temp = os.path.join(CONFIGPATH1, "%s.pref" % machinename)
-        print("****  probe_screen GETINIINFO **** \n Preference file path: %s" % temp)
+        print(("****  probe_screen GETINIINFO **** \n Preference file path: %s" % temp))
         return temp
 
     def get_display(self):
         # gmoccapy or axis ?
         temp = self.inifile.find("DISPLAY", "DISPLAY")
         if not temp:
-            print("****  probe_screen GETINIINFO **** \n Error recognition of display type : %s" % temp)
+            print(("****  probe_screen GETINIINFO **** \n Error recognition of display type : %s" % temp))
         return temp
 
     def add_history(self,tool_tip_text,s="",xm=0.,xc=0.,xp=0.,lx=0.,ym=0.,yc=0.,yp=0.,ly=0.,z=0.,d=0.,a=0.):
@@ -136,18 +139,18 @@ class ProbeScreenClass:
             if kind in (linuxcnc.NML_ERROR, linuxcnc.OPERATOR_ERROR):
 
                 typus = "error"
-                print typus, text
+                print(typus, text)
                 return -1
             else:
                 typus = "info"
-                print typus, text
+                print(typus, text)
                 return -1
         else:
             if "TRUE" in error_pin:
                 text = "User probe error"
                 self.add_history("Error: %s" % text,"",0,0,0,0,0,0,0,0,0,0,0)            
                 typus = "error"
-                print typus, text
+                print(typus, text)
                 return -1
         return 0
 
@@ -368,7 +371,7 @@ class ProbeScreenClass:
         gtkspinbutton.modify_font(pango.FontDescription('normal'))
         self.halcomp["ps_probe_latch"] = gtkspinbutton.get_value()
         self.prefs.putpref( "ps_probe_latch", gtkspinbutton.get_value(), float )
-        print "on_spbtn1_probe_latch_value_changed"
+        print("on_spbtn1_probe_latch_value_changed")
 
     def on_spbtn1_probe_diam_value_changed( self, gtkspinbutton, data = None ):
         gtkspinbutton.modify_font(pango.FontDescription('normal'))
@@ -516,7 +519,7 @@ class ProbeScreenClass:
             s +=  " X%.4f"%x      
             s +=  " Y%.4f"%y      
         s +=  " R%.4f"%self.spbtn_offs_angle.get_value()
-        print "s=",s                     
+        print("s=",s)
         self.gcode(s)
         time.sleep(1)
 

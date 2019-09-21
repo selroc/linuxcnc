@@ -56,9 +56,10 @@ TCLSRCS := \
 
 po/linuxcnc.pot:
 	$(ECHO) Localizing linuxcnc.pot
-	(cd ..; $(XGETTEXT) -k_ -o src/$@ `src/po/fixpaths.py -j src $^`)
-	touch $@
-TARGETS += po/linuxcnc.pot
+	$(ECHO) "SKIPPING Localizing linuxcnc.pot"
+	#(cd ..; $(XGETTEXT) -k_ -o src/$@ `src/po/fixpaths.py -j src $^`)
+	#touch $@
+#dng TARGETS += po/linuxcnc.pot
 
 pofiles: po/linuxcnc.pot
 	set -x; for i in po/*.po; do msgmerge -U $$i po/linuxcnc.pot; done

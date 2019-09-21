@@ -67,7 +67,7 @@ class GetIniInfo:
             else:
                 machinename = machinename.replace(" ", "_")
                 temp = os.path.join(CONFIGPATH, "%s.pref" % machinename)
-        print("**** GMOCCAPY GETINIINFO **** \nPreference file path: %s" % temp)
+        print(("**** GMOCCAPY GETINIINFO **** \nPreference file path: %s" % temp))
         return temp
 
     def get_coordinates(self):
@@ -120,10 +120,10 @@ class GetIniInfo:
         joint_axis_dic = {}
         coordinates = None
         for entry in temp:
-            print("Entry = {0}".format(entry))
+            print(("Entry = {0}".format(entry)))
             if "coordinates" in entry.lower():
                 coordinates = entry.split("=")[1].lower()
-                print("found the following coordinates {0}".format(coordinates))
+                print(("found the following coordinates {0}".format(coordinates)))
 
         if not coordinates:
             print("no coordinates found in [KINS] KINEMATICS, we will use order from")
@@ -133,8 +133,8 @@ class GetIniInfo:
         # at this point we should have the coordinates of the config, we will check if the amount of
         # coordinates does match the [KINS] JOINTS part
         print("\n**** GMOCCAPY GETINIINFO **** ")
-        print("Number of joints = {0}".format(self.get_joints()))
-        print("{0} COORDINATES found = {1}".format(len(coordinates), coordinates))
+        print(("Number of joints = {0}".format(self.get_joints())))
+        print(("{0} COORDINATES found = {1}".format(len(coordinates), coordinates)))
 
         # let us check if there are double letters, as that would be a gantry machine
         double_axis_letter = []
@@ -143,7 +143,7 @@ class GetIniInfo:
                 # OK we have a special case here, we need to take care off
                 # i.e. a Gantry XYYZ config
                 double_axis_letter.append(axisletter)
-                print("Fount double letter ", double_axis_letter)
+                print(("Fount double letter ", double_axis_letter))
 
         if self.get_joints() == len(coordinates):
             count = 0
@@ -152,7 +152,7 @@ class GetIniInfo:
                     axisletter = axisletter + str(count)
                     count += 1
                 joint_axis_dic[joint] = axisletter
-                print("joint {0} = axis {1}".format(joint, joint_axis_dic[joint]))
+                print(("joint {0} = axis {1}".format(joint, joint_axis_dic[joint])))
         else:
             print("\n**** GMOCCAPY GETINIINFO **** ")
             print("Amount of joints from [KINS]JOINTS= is not identical with axisletters")
@@ -166,23 +166,23 @@ class GetIniInfo:
             for joint, axisletter in enumerate(["x", "y", "z", "a", "b", "c", "u", "v", "w"]):
                 if axisletter in coordinates:
                     joint_axis_dic[joint] = axisletter
-        print joint_axis_dic
+        print(joint_axis_dic)
         #return sorted(joint_axis_dic, key=joint_axis_dic.get, reverse=False)
         return joint_axis_dic, double_axis_letter
 
     def get_trivial_kinematics(self):
         temp = self.inifile.find("KINS", "KINEMATICS").split()
-        print("found kinematics module", temp)
+        print(("found kinematics module", temp))
 
         if temp[0].lower() == "trivkins":
             print("\n**** GMOCCAPY GETINIINFO **** \n[KINS] KINEMATICS is trivkins")
             print("Will use mode to switch between Joints and World mode")
-            print("hopefully supported by the used <<{0}>> module\n".format(temp[0]))
+            print(("hopefully supported by the used <<{0}>> module\n".format(temp[0])))
             return True
         else:
             print("\n**** GMOCCAPY GETINIINFO **** \n[KINS] KINEMATICS is not trivkins")
             print("Will use mode to switch between Joints and World mode")
-            print("hopefully supported by the used <<{0}>> module\n".format(temp[0]))
+            print(("hopefully supported by the used <<{0}>> module\n".format(temp[0])))
             # I.e.
             # pumakins = 6 axis XYZABC
             # scarakins = 4 axis XYZA
@@ -314,7 +314,7 @@ class GetIniInfo:
         # and we want to set the default path
         default_path = self.inifile.find("DISPLAY", "PROGRAM_PREFIX")
         if not default_path:
-            print("**** GMOCCAPY GETINIINFO **** \nPath %s from DISPLAY , PROGRAM_PREFIX does not exist" % default_path)
+            print(("**** GMOCCAPY GETINIINFO **** \nPath %s from DISPLAY , PROGRAM_PREFIX does not exist" % default_path))
             print("**** GMOCCAPY GETINIINFO **** \nTrying default path...")
             default_path = "~/linuxcnc/nc_files/"
             if not os.path.exists(os.path.expanduser(default_path)):
@@ -432,7 +432,7 @@ class GetIniInfo:
                 if " " in element:
                     print("**** GMOCCAPY GETINIINFO **** \nERROR in user message setup \nPinname should not contain spaces")
                     return None
-            messages = zip(message_text, message_type, message_pinname)
+            messages = list(zip(message_text, message_type, message_pinname))
             return messages
 
     def get_machine_units(self):
@@ -440,6 +440,6 @@ class GetIniInfo:
         if units == "mm" or units == "cm" or units == "inch":
             return units
         else:
-            print("**** GMOCCAPY GETINIINFO **** \nERROR getting machine units \n"
-                  "please check [TRAJ] LINEAR_UNITS for a valid entry, found {0}".format(units))
+            print(("**** GMOCCAPY GETINIINFO **** \nERROR getting machine units \n"
+                  "please check [TRAJ] LINEAR_UNITS for a valid entry, found {0}".format(units)))
             return None

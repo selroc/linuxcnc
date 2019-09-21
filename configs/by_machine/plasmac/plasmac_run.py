@@ -74,7 +74,7 @@ class HandlerClass:
                     '#CUT_AMPS           = * (only used for operator information)\n'\
                     '#CUT_VOLTS          = * (modes 0 & 1 only, if not using auto voltage sampling)\n'\
                     '\n')
-            print('*** creating new material configuration file, {}'.format(self.materialFile))
+            print(('*** creating new material configuration file, {}'.format(self.materialFile)))
 
     def write_material(self, *items):
         mat = []
@@ -172,7 +172,7 @@ class HandlerClass:
                         self.dialog_error('\n{} is missing from Material #{}'.format(item, t_number))
         self.builder.get_object('material').set_active(0)
         self.materialList = []
-        for material in (self.materialFileDict.keys()):
+        for material in (list(self.materialFileDict.keys())):
             self.materialList.append(material)
         self.getMaterial = 0
 
@@ -348,7 +348,7 @@ class HandlerClass:
                             (item, theme) = line.strip().replace(" ", "").split('=')
             except:
                 self.dialog_error('Preferences file, {} is invalid ***'.format(self.prefFile))
-                print('*** preferences file, {} is invalid ***'.format(self.prefFile))
+                print(('*** preferences file, {} is invalid ***'.format(self.prefFile)))
         else:
             theme = self.i.find('PLASMAC', 'THEME') or gtk.settings_get_default().get_property('gtk-theme-name')
             font = self.i.find('PLASMAC', 'FONT') or gtk.settings_get_default().get_property('gtk-font-name')
@@ -386,7 +386,7 @@ class HandlerClass:
                                     tmpDict[key] = value
             except:
                 self.dialog_error('The plasmac configuration file, {} is invalid ***'.format(self.configFile))
-                print('*** plasmac configuration file, {} is invalid ***'.format(self.configFile))
+                print(('*** plasmac configuration file, {} is invalid ***'.format(self.configFile)))
             for item in self.configDict:
                 if item == 'material':
                     self.builder.get_object(item).set_active(0)
@@ -396,18 +396,18 @@ class HandlerClass:
                     if item in tmpDict:
                         self.builder.get_object(item).set_value(float(self.configDict.get(item)))
                     else:
-                        print('*** {} missing from {}'.format(item,self.configFile))
+                        print(('*** {} missing from {}'.format(item,self.configFile)))
                 elif isinstance(self.builder.get_object(item), gladevcp.hal_widgets.HAL_CheckButton):
                     if item in tmpDict:
                         self.builder.get_object(item).set_active(int(self.configDict.get(item)))
                     else:
-                        print('*** {} missing from {}'.format(item,self.configFile))
+                        print(('*** {} missing from {}'.format(item,self.configFile)))
             if convertFile:
-                print('*** converting {} to new format'.format(self.configFile))
+                print(('*** converting {} to new format'.format(self.configFile)))
                 self.save_settings()
         else:
             self.save_settings()
-            print('*** creating new run tab configuration file, {}'.format(self.configFile))
+            print(('*** creating new run tab configuration file, {}'.format(self.configFile)))
 
     def save_settings(self):
         try:
@@ -428,7 +428,7 @@ class HandlerClass:
                         f_out.write(key + '=' + str(value) + '\n')
         except:
             self.dialog_error('Error opening {}'.format(self.configFile))
-            print('*** error opening {}'.format(self.configFile))
+            print(('*** error opening {}'.format(self.configFile)))
 
     def idle_changed(self, halpin):
         if not halpin.get():

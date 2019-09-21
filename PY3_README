@@ -1,0 +1,239 @@
+Test branch for buster with python3 set as default
+
+#--------------------------------------------------------------
+0)    This branch will fail on all current buildbot machines.
+
+      This branch is rebased to master and force-pushed using
+      --force-with-lease option.
+
+1)    Branches containing this file (PY3_README) are test
+      branches for using LinuxCNC with python3 as the 
+      *default* python for scripts *and* extensions.
+
+      The major issues relate to the python extensions --
+      especially rs274ngc/interpmodule.cc which is required
+      for remap (not working).
+
+1.1)  Debian buster is the first debian distribution that
+      purports to default to python3:
+      Ref: https://wiki.debian.org/Python#Python_in_Debian
+      (But not so on install from this iso:
+         debian-live-10.1.0-amd64-xfce.iso
+      where python2.7 is still the default)
+
+1.2)  The main linuxcnc script will exit if python3 is 
+      not setup as the default python interpreter.
+
+1.3)  Python *.py files are converted with /usr/bin/2to3-2.7 with
+      some minor fixups.  The program is in the package
+      $ dpkg -S /usr/bin/2to3-2.7 (pkg: python2.7)
+
+      Extensions (*module.cc) converted using various
+      guides. 
+          https://py3c.readthedocs.io/en/latest/reference.html
+          etc.
+
+1.4)  If system has *both* python2 and python3 installed, configure
+      update-alternatives and then select python3.x. (You
+      can always restore python2 as default).
+
+      Example setup commands (as root):
+      \# update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1
+      \# update-alternatives --install /usr/bin/python python /usr/bin/python3.7 2
+      \# update-alternatives --config python
+      > There are 2 choices for the alternative python (providing /usr/bin/python).
+      >
+      >  Selection    Path                Priority   Status
+      >------------------------------------------------------------
+      >* 0            /usr/bin/python3.7   2         auto mode
+      >  1            /usr/bin/python2.7   1         manual mode
+      >  2            /usr/bin/python3.7   2         manual mode
+      >Press <enter> to keep the current choice[*], or type selection number: 
+      >
+      >Similar steps for python-config, example:
+      ># update-alternatives --install /usr/bin/python-config python-config /usr/bin/python2.7-config 2
+      ># update-alternatives --install /usr/bin/python-config python-config /usr/bin/python3.7-config 1
+      ># update-alternatives --config python-config
+      ># update-alternatives --config python-config
+      >There are 2 choices for the alternative python-config (providing /usr/bin/python-config).
+      >
+      >  Selection    Path                       Priority   Status
+      >------------------------------------------------------------
+      >* 0            /usr/bin/python3.7-config   2         auto mode
+      >  1            /usr/bin/python2.7-config   1         manual mode
+      >  2            /usr/bin/python3.7-config   2         manual mode
+      >
+      >Press <enter> to keep the current choice[*], or type selection number: 
+
+      ($ man update-alternatives for more info)
+
+1.5   Example libboost configuration:
+      $ dpkg -l 'libboost*'|grep python|grep ii
+      ii  libboost-python-dev     1.67.0.1  amd64 Boost.Python Library...
+      ii  libboost-python1.67-dev 1.67.0-13 amd64 Boost.Python Library...
+      ii  libboost-python1.67.0   1.67.0-13 amd64 Boost.Python Library
+
+1.6)  Configure commands for libboost (python3.7):
+      $ cd src
+      $ ./autogen.sh
+      $ ./configure --with-realtime=uspace
+      (default:   uses boost_python3-py37)
+      (alternate: use  --with-boost-python=boost_python3-pyNN)
+
+#--------------------------------------------------------------
+2)    Operating System(s) undergoing test
+2.1)  Debian GNU/Linux 10 (buster)
+      $ lsb_release -r -->  Release:	10
+      $ uname -r       --> 4.19.0-6-rt-amd64
+
+#--------------------------------------------------------------
+3)     Major current KNOWN problem areas
+
+3.1)   BOOST python modules
+3.1.1) rs274ngc/interpmodule.cc ------- not working (_task=0)
+       Breaks remap
+3.1.2) rs274ngc/canonmodule.cc -------- not working (_task=0)
+3.1.3) task/taskmodule.cc ------------- not working (_task=0)
+3.1.4) kinematics/rotarydeltakins.cc -- working
+3.1.5) kinematics/lineardeltakins.cc -- working
+
+3.2)   non-boost python modules:
+3.2.1) hal/halmodule.cc --------------- working (shm parts not updated)
+3.2.2) rs274ngc/gcodemodule.cc -------- working (lightly tested)
+
+3.3)   gtk2 is not available for use with python3
+       Python3 using:
+          >>> import gi
+          >>> gi.require_version('Gtk',2.0')
+          >>> from gi.repository import Gtk as gtk
+       Results in:
+          "/usr/lib/python3/dist-packages/gi/overrides/Gtk.py:55:
+          RuntimeWarning: You have imported the Gtk 2.0 module.
+          Because Gtk 2.0 was not designed for use with introspection
+          some of the interfaces and API will fail.  As such this is
+          not supported by the pygobject development team and we
+          encourage you to port your app to Gtk 3 or greater. PyGTK
+          is the recomended python module to use with Gtk 2.0"
+
+       Buster includes deb package: python-gtk2, but it works with
+       python2 ONLY:
+       $ python2 -c "import gtk;print(gtk.gtk_version);\
+                     print(gtk.pygtk_version)"
+       (2, 24, 32)
+       (2, 24, 0)
+
+       Summary: gtk applications need to be ported to Gtk 3
+       Note: it should be possible to use #!/usr/bin/python2 in
+             numerous applications (gladevcp,gmoccapy,etc)
+             but confusing to have some apps python2, some
+             apps python3, and extensions using python3
+
+3.4)   glade
+       Buster includes package python-gtk2 and can import gtk.glade
+       but it works with python2 only:
+       $ python2 -c "import gtk.glade;print (dir(gtk.glade))"
+       ['XML', '__doc__', ...
+
+3.5)   pango
+       Using:
+          >>> import gi
+          >>> gi.require_version('Pango',1.0')
+          >>> from gi.repository import Pango as pango
+       No errors reported
+       (Incorporated but untested (because of gtk/glade problems))
+
+3.6)   pangocairo
+       >>> import gi
+       >>> gi.require_version('PangoCairo', '1.0')
+       >>> from gi.repository import Pango as pango
+       but, subsequent error in (original) glnav.py is:
+        'gi.repository.PangoCairo' object has no attribute 'CairoContext' 
+       (see glnav workarounds)
+
+3.7)   gobject:
+       >>> import gi
+       >>> from gi.repository import GObject as gobject
+       (Incorporated but untested (because of gtk/glade problems))
+
+#--------------------------------------------------------------
+4)   runtests -- numerous problems, not addressed.
+     Current:
+     Runtest: 229 tests run, 109 successful, 120 failed
+
+     Note: runtests script is currently *disabled*
+#--------------------------------------------------------------
+
+5)   deb building
+
+5.1) works and configures for a python3 system
+     (the buildbot does have a buster config and this
+      branch will fail on all existing buildbot branches)
+
+5.2) Docs packages are disabled
+
+#--------------------------------------------------------------
+6)   Workarounds in place
+
+6.1) pango/cairo/pangocairo fail numerous ways on buster-python3
+     so prior method for creating DRO text in preview fails.
+     Workaround in glnav.py uses a fixed bitmap for text
+     characters provided by new file: lib/python/font_bitmaps.py
+     The file was created using added utility:
+         scripts/make_font_bitmaps.py
+     which uses a method adapted from legacy glnav.py and python2.
+     Currently support uppercase only and no large dro font
+     
+6.2) interp_python.cc fake msg for broken handle_pyerror()
+
+6.3) halmodule.cc shm stuff commented out using
+      \#undef  PY3_SHM_FIXES
+      \#define PY3_SHM_FIXES to work on this
+
+6.4) startup tests with deb package:
+     axis       starts
+     tklinuxcnc starts
+     gscreen    fails at import pygtk
+     touchy     fails at import gtk
+     gmoccapy   fails at import hal_glib
+#--------------------------------------------------------------
+7)   Other notes
+
+7.1) Source files include 'PY3' text for notes of interest
+
+7.2) Some code is modified to catch errors, print
+     a problem message and allow continued execution
+     
+7.3) numerous debugging prints occur for python_plugin and
+     the interp module python extension.  It loads ok in task,
+     but fails in axis/glcanon with message:
+     ImportError: 'interpreter' is not a built-in module
+
+7.4) the file src/emc/rs274ngc/interp_tests is conditionally
+     \#included in rs274ngc_pre.cc, enable for testing only.
+
+7.5) because work on qt items is ongoing,
+     most of the qt-related *.py python files are *not*
+     updated in this branch as it makes for merge/rebase
+     problems with the master branch since it keeps changing.
+
+     Future: running 2to3 on qt related py files should
+     not be a problem.
+
+     Existing changes for qt  python files by 2to3:
+
+     src/emc/usr_intf/gremlin/qt5_graphics.py
+     -import thread
+     +import _thread
+
+     src/emc/usr_intf/qtvcp/qtvcp.py
+     - gettext.install(PATH.DOMAIN, localedir=PATH.LOCALEDIR, unicode=True)
+     + gettext.install(PATH.DOMAIN, localedir=PATH.LOCALEDIR, str=True)
+
+7.6) removed unused file src/emc/sai/builtin_modules.cc
+
+7.7) some .py files with tab/indent damage have been fixed with
+     reindent.py in package python3.7-examples:
+     /usr/share/doc/python3.7/examples/scripts/reindent.py
+
+7.8) rs274 seems to work (was segfaulting)
+#--------------------------------------------------------------

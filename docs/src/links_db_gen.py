@@ -15,5 +15,5 @@ for f in sys.argv[2:]:
 		if not l:
 			continue
 		d[l] = base
-for k, v in d.items():
-	print '%s\t%s' % (k, v)
+for k, v in list(d.items()):
+	print('%s\t%s' % (k, v))

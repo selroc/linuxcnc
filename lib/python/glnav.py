@@ -2,27 +2,22 @@ from minigl import *
 import math
 import array, itertools
 
+# PY3workaround: import font bitmaps
+#    missing capabilities in python3 modules (pango,cairo,pangocairo)
+import font_bitmaps # PY3hack to import bitmaps (0-127)
+
 def use_pango_font(font, start, count, will_call_prepost=False):
-    import pango, cairo, pangocairo
-    fontDesc = pango.FontDescription(font)
-    a = array.array('b', itertools.repeat(0, 256*256))
-    surface = cairo.ImageSurface.create_for_data(a, cairo.FORMAT_A8, 256, 256)
-    context = pangocairo.CairoContext(cairo.Context(surface))
-    layout = context.create_layout()
-    fontmap = pangocairo.cairo_font_map_get_default()
-    font = fontmap.load_font(fontmap.create_context(), fontDesc)
-    layout.set_font_description(fontDesc)
-    metrics = font.get_metrics()
-    descent = metrics.get_descent()
-    d = pango.PIXELS(descent)
-    linespace = metrics.get_ascent() + metrics.get_descent()
-    width = metrics.get_approximate_char_width()
+
+    w   = font_bitmaps.width   # PY3font_bitmaps
+    h   = font_bitmaps.height  # PY3font_bitmaps
+    d   = font_bitmaps.descent # PY3font_bitmaps
+    DIM = font_bitmaps.DIM     # PY3font_bitmaps
 
     glPushClientAttrib(GL_CLIENT_PIXEL_STORE_BIT)
     glPixelStorei(GL_UNPACK_SWAP_BYTES, 0)
     glPixelStorei(GL_UNPACK_LSB_FIRST, 1)
-    glPixelStorei(GL_UNPACK_ROW_LENGTH, 256)
-    glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, 256)
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, DIM)
+    glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, DIM)
     glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0)
     glPixelStorei(GL_UNPACK_SKIP_ROWS, 0)
     glPixelStorei(GL_UNPACK_SKIP_IMAGES, 0)
@@ -31,36 +26,26 @@ def use_pango_font(font, start, count, will_call_prepost=False):
 
     base = glGenLists(count)
     for i in range(count):
-        ch = unichr(start+i)
-        layout.set_text(ch)
-        w, h = layout.get_size()
-        context.save()
-        context.new_path()
-        context.rectangle(0, 0, 256, 256)
-        context.set_source_rgba(0., 0., 0., 0.)
-        context.set_operator (cairo.OPERATOR_SOURCE);
-        context.paint()
-        context.restore()
-
-        context.save()
-        context.set_source_rgba(1., 1., 1., 1.)
-        context.set_operator (cairo.OPERATOR_SOURCE);
-        context.move_to(0, 0)
-        context.update_layout(layout)
-        context.show_layout(layout)
-        context.restore()
-
-        w, h = pango.PIXELS(w), pango.PIXELS(h)
+        if not i in font_bitmaps.fbits:
+            # these chars not supported
+            glNewList(base+i, GL_COMPILE)
+            glEndList()
+            continue
         glNewList(base+i, GL_COMPILE)
         glBitmap(0, 0, 0, 0, 0, h-d, '');
         if not will_call_prepost: pango_font_pre()
-        if w and h: glDrawPixels(w, h, GL_LUMINANCE, GL_UNSIGNED_BYTE, a)
+        if w and h: glDrawPixels(w, h, GL_LUMINANCE, GL_UNSIGNED_BYTE, font_bitmaps.fbits[i])
         glBitmap(0, 0, 0, 0, w, -h+d, '');
         if not will_call_prepost: pango_font_post()
         glEndList()
 
     glPopClientAttrib()
-    return base, pango.PIXELS(width), pango.PIXELS(linespace)
+    try: # PY3font_bitmaps
+        return base, pango.PIXELS(width), pango.PIXELS(linespace)
+    except Exception as e:
+        print("\nPY3 glnav.py:use_pango_font(): missing pango/cairo features\n"
+                "    using hardcoded bitmaps,w=%d h=%d\n"%(w,h))
+        return base, w, h # PY3font_bitmaps
 
 def pango_font_pre(rgba=(1., 1., 0., 1.)):
     glPushAttrib(GL_COLOR_BUFFER_BIT)
@@ -106,7 +91,7 @@ def glRotateScene(w, s, xcenter, ycenter, zcenter, x, y, mousex, mousey):
     w.lon = lon
 
 def sub(x, y):
-    return map(lambda a, b: a-b, x, y)
+    return list(map(lambda a, b: a-b, x, y))
 
 def dot(x, y):
     t = 0
@@ -115,8 +100,8 @@ def dot(x, y):
     return t
 
 def glDistFromLine(x, p1, p2):
-    f = map(lambda x, y: x-y, p2, p1)
-    g = map(lambda x, y: x-y, x, p1)
+    f = list(map(lambda x, y: x-y, p2, p1))
+    g = list(map(lambda x, y: x-y, x, p1))
     return dot(g, g) - dot(f, g)**2/dot(f, f)
 
 def v3distsq(a,b):

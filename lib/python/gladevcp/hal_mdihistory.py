@@ -15,14 +15,18 @@
 # GNU General Public License for more details.
 
 import os
-import pango
 
-import gobject, gtk
+import gi
+gi.require_version ('Pango','1.0')
+from   gi.repository import Pango as pango
+from   gi.repository import GObject as gobject
 
-from hal_widgets import _HalWidgetBase
+import gtk
+
+from .hal_widgets import _HalWidgetBase
 import linuxcnc
 from hal_glib import GStat
-from hal_actions import _EMC_ActionBase, ensure_mode
+from .hal_actions import _EMC_ActionBase, ensure_mode
 # path to TCL for external programs eg. halshow
 try:
     TCLPATH = os.environ['LINUXCNC_TCL_DIR']
@@ -115,10 +119,10 @@ class EMC_MDIHistory(gtk.VBox, _EMC_ActionBase):
             fp = open(self.filename)
         except:
             return
-        lines = map(str.strip, fp.readlines())
+        lines = list(map(str.strip, fp.readlines()))
         fp.close()
 
-        lines = filter(bool, lines)
+        lines = list(filter(bool, lines))
         for l in lines:
             self.model.append((l,))
         path = (len(lines)-1,)
@@ -239,7 +243,7 @@ class EMC_MDIHistory(gtk.VBox, _EMC_ActionBase):
         self.entry.grab_focus()
         self.entry.set_position(-1)
         if event.type == gtk.gdk._2BUTTON_PRESS:
-            print("Double Click", self.use_double_click)
+            print(("Double Click", self.use_double_click))
             if self.use_double_click:
                 self.submit()
 
@@ -274,7 +278,7 @@ class EMC_MDIHistory(gtk.VBox, _EMC_ActionBase):
     # Get property
     def do_get_property(self, property):
         name = property.name.replace('-', '_')
-        if name in self.__gproperties.keys():
+        if name in list(self.__gproperties.keys()):
             return getattr(self, name)
         else:
             raise AttributeError('unknown property %s' % property.name)
@@ -283,7 +287,7 @@ class EMC_MDIHistory(gtk.VBox, _EMC_ActionBase):
     def do_set_property(self, property, value):
         try:
             name = property.name.replace('-', '_')
-            if name in self.__gproperties.keys():
+            if name in list(self.__gproperties.keys()):
                 setattr(self, name, value)
                 self.queue_draw()
                 if name == "font_size_tree":

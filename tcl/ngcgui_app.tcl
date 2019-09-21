@@ -80,13 +80,7 @@ from axis.py (LinuxCNC 2.5) or"] \[DISPLAY\]USER_COMMAND_FILE (LinuxCNC 2.4)"
   set ::ngcguict 0
   foreach fname $ngcgui_subfile {
     set wtab [dynamic_tab ngcgui$::ngcguict [file tail $fname] ] ;# axis func
-    if {"$wtab" == "None"} {
-      # functions of tkapp.py were incorporated in LinuxCNC  2.5 27dec10 af6ae9907e1c0
-      #puts "\nerrorInfo: $::errorInfo"
-      puts "\n[_ "LinuxCNC version"] = $::version"
-      puts "[_ "for LinuxCNC 2.5.xxx, Do not include tkapp.py in the ini file"]\n"
-      continue
-    }
+
     set w [frame $wtab.tframe -container 0 -borderwidth 0 -highlightthickness 0]
     pack $w -side top -fill both -expand 1 -anchor nw
 

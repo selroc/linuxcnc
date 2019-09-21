@@ -60,7 +60,7 @@ class HandlerClass:
     # gscreen won't connect a callback to it's method.
     # Meaning this is the only one called.
     def on_estop_clicked(self,*args):
-        print "estop"
+        print("estop")
         if self.data.estopped:
             self.emc.estop_reset(1)
         else:

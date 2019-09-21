@@ -44,4 +44,4 @@ if len(sys.argv) > 3:
 
 l = sys.argv[2]
 if l in links:
-    print relpath(links[l] + '.html', path)
+    print(relpath(links[l] + '.html', path))

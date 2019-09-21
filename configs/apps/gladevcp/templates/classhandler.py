@@ -28,15 +28,15 @@ class HandlerClass:
 
 
     def on_button_press(self,widget,data=None):
-        print "on_button_press"
+        print("on_button_press")
 
 
     def on_destroy(self,obj,data=None):
-        print "on_destroy"
+        print("on_destroy")
 
 
     def _on_timer_tick(self,userdata=None):
-        print "timer tick"
+        print("timer tick")
         return True
 
 
@@ -54,6 +54,6 @@ class HandlerClass:
 def get_handlers(halcomp,builder,useropts):
 
     for cmd in useropts:
-        exec cmd in globals()
+        exec(cmd, globals())
 
     return [HandlerClass(halcomp,builder,useropts)]

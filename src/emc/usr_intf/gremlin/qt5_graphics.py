@@ -26,7 +26,9 @@ except ImportError:
     log.error('Qtvcp Error with graphics - is python-openGL installed?')
     LIB_GOOD = False
 
-import pango
+import gi
+gi.require_version ('Pango','1.0')
+from   gi.repository import Pango as pango
 import glnav
 from rs274 import glcanon
 from rs274 import interpret
@@ -39,7 +41,7 @@ import tempfile
 import shutil
 import os
 
-import thread
+import _thread
 
 ###################################
 # For stand alone window
@@ -149,7 +151,7 @@ class Lcnc_3dGraphics(QGLWidget,  glcanon.GlCanonDraw, glnav.GlNavBase):
             self.get_geometry()
         )
         # start tracking linuxcnc position so we can plot it
-        thread.start_new_thread(self.logger.start, (.01,))
+        _thread.start_new_thread(self.logger.start, (.01,))
         glcanon.GlCanonDraw.__init__(self, linuxcnc.stat(), self.logger)
 
         # set defaults
@@ -258,7 +260,9 @@ class Lcnc_3dGraphics(QGLWidget,  glcanon.GlCanonDraw, glnav.GlNavBase):
         self.set_current_view()
 
     def calculate_gcode_properties(self, canon):
-        def dist((x,y,z),(p,q,r)):
+        def dist(x_y_z, p_q_r):
+            (x,y,z) = x_y_z
+            (p,q,r) = p_q_r
             return ((x-p)**2 + (y-q)**2 + (z-r)**2) ** .5
         def from_internal_units(pos, unit=None):
             if unit is None:

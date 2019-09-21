@@ -51,7 +51,7 @@ class HandlerClass:
         if isinstance(w,gtk.Label):
             parent = w.get_parent()
             if not isinstance(parent,gtk.EventBox):
-                print >> sys.stderr,"warning: the %s Label widget is not enclosed in an EventBox" % w.get_name()
+                print("warning: the %s Label widget is not enclosed in an EventBox" % w.get_name(), file=sys.stderr)
             parent.modify_bg(state, color)
         else:
             # non-label widgets can be directly colorized
@@ -67,7 +67,7 @@ class HandlerClass:
         '''
         
         value = hal_widget.hal_pin.get()
-        if not table.has_key(value):
+        if value not in table:
             text = default_text + str(value)
             color = default_color
         else:

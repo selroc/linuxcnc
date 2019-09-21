@@ -23,7 +23,7 @@ EFFECTOR_OFFSET = CARRIAGE_OFFSET = 30
 MIN_JOINT = -375
 MAX_JOINT = 0
 
-for setting in sys.argv[1:]: exec setting
+for setting in sys.argv[1:]: exec(setting)
 
 c = hal.component("lineardelta")
 c.newpin("joint0", hal.HAL_FLOAT, hal.HAL_IN)
@@ -43,7 +43,7 @@ class DeltaTranslate(Collection):
 
     def apply(self):
         glPushMatrix()
-        lineardeltakins.set_geometry(self.comp['R'], self.comp['L'])        
+        lineardeltakins.set_geometry(self.comp['R'], self.comp['L'])
         f = lineardeltakins.forward(self.comp['joint0'], self.comp['joint1'], self.comp['joint2'])
         if f is not None:
             self.x = x = f[0]
@@ -68,7 +68,7 @@ class TriangularPrismZ:
         x0 = 0
         x1 = -self.h*sin(pi/3)
         x2 = self.h*sin(pi/3)
-        y0 = self.h 
+        y0 = self.h
         y1 = y2 = -self.h*cos(pi/3)
         z0 = self.z0
         z1 = self.z1
@@ -167,14 +167,14 @@ class Strut:
 
     def cylinder(self, L):
         gluCylinder(self.q, 5, 5, L, 32, 1)
-	# bottom cap
-	glRotatef(180,1,0,0)
-	gluDisk(self.q, 0, 5, 32, 1)
-	glRotatef(180,1,0,0)
-	# the top cap needs flipped and translated
-	glTranslatef(0,0, L)
-	gluDisk(self.q, 0, 5, 32, 1)
-       
+        # bottom cap
+        glRotatef(180,1,0,0)
+        gluDisk(self.q, 0, 5, 32, 1)
+        glRotatef(180,1,0,0)
+        # the top cap needs flipped and translated
+        glTranslatef(0,0, L)
+        gluDisk(self.q, 0, 5, 32, 1)
+
 tooltip = Capture()
 tool = DeltaTranslate([
     Translate([

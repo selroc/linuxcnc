@@ -118,7 +118,7 @@ class LinuxCNC:
 
 	axis_letter = axis_letter.lower()
 	axis_index = 'xyzabcuvw'.index(axis_letter)
-	print "waiting for axis", axis_letter, "to stop"
+	print("waiting for axis", axis_letter, "to stop")
 	self.status.poll()
 	start_time = time.time()
 	prev_pos = self.status.position[axis_index]
@@ -160,7 +160,7 @@ class LinuxCNC:
 	axis_index = 'xyzabcuvw'.index(axis_letter)
 	start_pos = self.status.position
 
-	print "jogging axis %s from %.3f to %.3f" % (axis_letter, start_pos[axis_index], target)
+	print("jogging axis %s from %.3f to %.3f" % (axis_letter, start_pos[axis_index], target))
 
 	if self.status.position[axis_index] < target:
 	    vel = abs(vel)
@@ -183,7 +183,7 @@ class LinuxCNC:
 	if not done(self.status.position[axis_index]):
             raise LinuxCNC_Exception("failed to jog axis %s to %.3f\n" % (axis_letter, target) + "timed out at %.3f after %.3f seconds" % (self.status.position[axis_index], timeout))
 
-	print "    jogged axis %d past target %.3f" % (axis_index, target)
+	print("    jogged axis %d past target %.3f" % (axis_index, target))
 
 	self.wait_for_axis_to_stop(axis_letter)
 
@@ -228,7 +228,7 @@ class LinuxCNC:
 	    vel = self.status.position[axis_index] - prev_pos
 	    error = math.fabs(self.status.position[axis_index] - target)
 	    if (error < tolerance) and (vel == 0):
-		print "axis %s stopped at %.3f" % (axis_letter, target)
+		print("axis %s stopped at %.3f" % (axis_letter, target))
 		return
 	    time.sleep(0.1)
 	raise LinuxCNC_Exception("timeout waiting for axis %s to stop at %.3f (pos=%.3f, vel=%.3f)" % (axis_letter, target, self.status.position[axis_index], vel))
@@ -280,7 +280,7 @@ class LinuxCNC:
 	    time.sleep(0.1)
             self.status.poll()
 	    if self.status.tool_in_spindle == expected_tool:
-		print "the Stat buffer's toolInSpindle reached the value of %d after %f seconds" % (expected_tool, time.time() - start_time)
+		print("the Stat buffer's toolInSpindle reached the value of %d after %f seconds" % (expected_tool, time.time() - start_time))
 		return
 	raise LinuxCNC_Exception("the Stat buffer's toolInSpindle value is %d, expected %d" % (self.status.tool_in_spindle, expected_tool))
 

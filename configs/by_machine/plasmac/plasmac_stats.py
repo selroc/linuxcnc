@@ -46,7 +46,7 @@ class HandlerClass:
                         if 'gtk_theme' in line and not 'Follow System Theme' in line:
                             (item, theme) = line.strip().replace(" ", "").split('=')
             except:
-                print('*** configuration file, {} is invalid ***'.format(self.prefFile))
+                print(('*** configuration file, {} is invalid ***'.format(self.prefFile)))
         gtk.settings_get_default().set_property('gtk-theme-name', theme)
 
     def pierce_count_changed(self,halpin):

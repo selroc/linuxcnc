@@ -16,7 +16,7 @@ debug = 0
 class HandlerClass:
 
     def on_destroy(self,obj,data=None):
-        print "on_destroy"
+        print("on_destroy")
         self.halcomp.exit() # avoid lingering HAL component
         gtk.main_quit()
 
@@ -24,7 +24,7 @@ class HandlerClass:
         model = combobox.get_model()
         index = combobox.get_active()
         if index:
-            print 'index of selected value',index
+            print('index of selected value',index)
         return
 
 
@@ -53,7 +53,7 @@ def get_handlers(halcomp,builder,useropts):
 
     global debug
     for cmd in useropts:
-        exec cmd in globals()
+        exec(cmd, globals())
 
     return [HandlerClass(halcomp,builder,useropts)]
 

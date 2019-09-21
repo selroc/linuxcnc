@@ -65,7 +65,7 @@ class HandlerClass:
 
     # erase the ready-to-home message on statusbar
     def on_hal_status_all_homed(self,widget):
-        print "all-homed"
+        print("all-homed")
         self.data.all_homed = True
         self.widgets.statusbar1.remove_message(self.gscreen.statusbar_id,self.gscreen.homed_status_message)
 
@@ -130,7 +130,7 @@ class HandlerClass:
         self.gscreen.statusbar_id = self.widgets.statusbar1.get_context_id("Statusbar1")
         self.gscreen.homed_status_message = self.widgets.statusbar1.push(1,"Ready For Homing")
         for num,i in enumerate(self.data.jog_increments):
-            print i
+            print(i)
             self.widgets.jog_speed.append_text(i)
             if i == "continuous":
                 self.data.current_jogincr_index = num
@@ -172,7 +172,7 @@ class HandlerClass:
             return True
     def on_keycall_INCREMENTS(self,state,SHIFT,CNTRL,ALT):
         if state and self.data._MAN in self.check_mode(): # manual mode required
-            print 'hi'
+            print('hi')
             if SHIFT:
                 self.gscreen.set_jog_increments(index_dir = -1)
             else:

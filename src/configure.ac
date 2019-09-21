@@ -74,13 +74,14 @@ using namespace boost::python;
 AS_IF([test "x$ac_cv_boost_python" = xyes],
 [
   BOOST_PYTHON_LIBS=
-  ax_python_lib=boost_python
+  # oct2019: python3 on buster: -lboost_python3-py37
+  ax_python_lib=boost_python3-py37
   AC_ARG_WITH([boost-python],
     AS_HELP_STRING(
         [--with-boost-python],
-        [Specify the boost python shared library to use. For
-        instance, --with-boost-python=boost_python-py25. Defaults to
-        boost-python. If you use this then you should probably set PYTHON
+        [Specify the boost python3 shared library to use. For
+        instance, --with-boost-python=boost_python3-pyNN. Defaults to
+        boost_python3-py37. If you use this then you should probably set PYTHON
         too, to avoid using multiple python versions.]
     ),
   [if test "x$with_boost_python" != xno; then
@@ -88,6 +89,7 @@ AS_IF([test "x$ac_cv_boost_python" = xyes],
     ax_boost_python_lib=boost_python-$with_boost_python
   fi])
   AC_MSG_CHECKING([for boost::python shared library])
+
   for ax_lib in "$ax_python_lib" "$ax_boost_python_lib" boost_python
   do
     # Note that this requires LIBPYTHON from configure.ac
@@ -96,6 +98,7 @@ AS_IF([test "x$ac_cv_boost_python" = xyes],
       [AC_LANG_PROGRAM([[#include <boost/python/object_fwd.hpp>]], [[boost::python::object *test_object;]])],
       [BOOST_PYTHON_LIBS="-l$ax_lib"; break])
   done
+
   AS_IF([test "x$BOOST_PYTHON_LIBS" != x], [ax_result=$BOOST_PYTHON_LIBS], [ax_result=])
   AC_MSG_RESULT([$ax_result])
 ])
@@ -941,7 +944,7 @@ fi
 AC_PATH_PROGS(YAPPS, yapps yapps2, "none", $SPATH)
 if test $YAPPS = "none"
 then
-    AC_MSG_ERROR([yapps/yapps2 and not found])
+    AC_MSG_ERROR([ yapps/yapps2 and not found])
 fi
 AC_SUBST(YAPPS)
 

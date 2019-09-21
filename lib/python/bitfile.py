@@ -53,7 +53,8 @@ class BitFile:
     def __delitem__(self, item):
 	del self.chunks[item]
 
-    def chunkorder(self, (tag, value)):
+    def chunkorder(self, tag_value):
+	(tag, value) = tag_value
 	if tag in self.ORDER:
 	    return self.ORDER.index(tag)
 	return 256 + ord(tag)
@@ -61,7 +62,7 @@ class BitFile:
     @classmethod
     def fromstring(cls, data):
 	if not data.startswith(cls.MAGIC):
-	    raise ValueError, "data does not start with the magic number"
+	    raise ValueError("data does not start with the magic number")
 	i = len(cls.MAGIC)
 	chunks = {}
 	while i < len(data):
@@ -74,7 +75,7 @@ class BitFile:
 		i = i + 5
 	    chunkdata = data[i:i+chunksize]
 	    if tag in chunks:
-		raise ValueError, "bitfile has chunk %r more than once" % tag
+		raise ValueError("bitfile has chunk %r more than once" % tag)
 	    chunks[tag] = chunkdata
 	    i = i + chunksize
 	return cls(chunks)
@@ -89,9 +90,9 @@ class BitFile:
 
     def tostring(self):
 	result = self.MAGIC
-	for tag, chunkdata in sorted(self.chunks.items(), key=self.chunkorder):
+	for tag, chunkdata in sorted(list(self.chunks.items()), key=self.chunkorder):
 	    if len(tag) != 1:
-		raise ValueError, "Tag %r must be a length-1 string" % tag
+		raise ValueError("Tag %r must be a length-1 string" % tag)
 	    result = result + tag
 	    if tag in self.SMALLCHUNKS:
 		result += struct.pack(">H", len(chunkdata))
@@ -116,9 +117,9 @@ if __name__ == '__main__':
 	c['e'] = "goodbye"
 	c['A'] = "shazam"
 	s = c.tostring()
-	print repr(s)
+	print(repr(s))
 	d = BitFile.fromstring(s)
-	print d.chunks
+	print(d.chunks)
 	assert d.tostring() == s
 
     for bitfile in sys.argv[1:]:
@@ -126,9 +127,9 @@ if __name__ == '__main__':
 	c = BitFile.fromstring(bits)
 	for k, v in sorted(c.chunks.items()):
 	    if k in 'abcd':
-		print k, v
+		print(k, v)
 	    else:
-		print k, len(v)
+		print(k, len(v))
 	newbits = c.tostring()
 	assert bits == newbits  # Assuming the original is in canonical order!
-	print
+	print()

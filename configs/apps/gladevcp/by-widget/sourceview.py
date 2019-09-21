@@ -20,7 +20,7 @@ class HandlerClass:
 
     def file_set(self,widget,data=None):
         filename = widget.get_filename()
-        print "file_set",filename
+        print("file_set",filename)
         self.textbuffer.set_text(open(filename).read())
         self.line = 1
         self._set_line(self.line)    

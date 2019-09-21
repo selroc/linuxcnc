@@ -8,7 +8,7 @@ pngfile = 'vortex.me.png'
 class HandlerClass:
 
     def on_expose(self,widget,data=None):
-        print "on_expose"
+        print("on_expose")
         cr = widget.window.cairo_create()
         
         # Sets the operator to clear which deletes everything below 

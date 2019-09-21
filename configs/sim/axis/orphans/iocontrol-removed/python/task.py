@@ -24,12 +24,12 @@ import interpreter
 try:
     import emctask
     import customtask
-except ImportError,e:
-    print "failed on import emctask,customtask",e
+except ImportError as e:
+    print("failed on import emctask,customtask",e)
     pass
 
 try:
-    import cPickle as pickle
+    import pickle as pickle
 except ImportError:
     import pickle
 
