@@ -72,8 +72,8 @@ EXTRA_FILES=
 EXTRA_BUILD=
 KERNEL_VERSION=$TARGET
 DRIVERS=drivers.files.in
-PYTHON_VERSION=$(python -c 'import sys; print sys.version[:3]')
-PYTHON_VERSION_NEXT=$(python -c 'import sys; print sys.version[:2] + str(1+int(sys.version[2]))')
+PYTHON_VERSION=$(python -c 'import sys; print(sys.version[:3])')
+PYTHON_VERSION_NEXT=$(python -c 'import sys; print(sys.version[:2] + str(1+int(sys.version[2])))')
 LIBREADLINE_DEV=libreadline-gplv2-dev
 
 BUILD_RTAI=false
@@ -149,7 +149,7 @@ fi
 DOC_DEPENDS='asciidoc (>= 8.5), dblatex (>= 0.2.12), docbook-xsl, dvipng, ghostscript, graphviz, groff, imagemagick, inkscape, python-lxml, source-highlight, texlive-extra-utils, texlive-font-utils, texlive-fonts-recommended, texlive-lang-cyrillic, texlive-lang-french, texlive-lang-german, texlive-lang-polish, texlive-lang-spanish, texlive-latex-recommended, w3c-linkchecker, xsltproc'
 MODUTILS_DEPENDS=kmod
 PYTHON_PACKAGING_DEPENDS=dh-python
-PYTHON_PACKAGING=dh_python2
+PYTHON_PACKAGING=dh_python3
 PYTHON_GST=python-gst0.10,gstreamer0.10-plugins-base
 TCLTK_VERSION=8.6
 PYTHON_IMAGING="python${PYTHON_VERSION}-imaging | python-imaging | python-pil"
@@ -160,8 +160,8 @@ case $DISTRIB_NAME in
     Debian-10|Debian-10.*)
         DOC_DEPENDS="$DOC_DEPENDS, asciidoc-dblatex"
         PYTHON_GST=python-gst-1.0,gstreamer1.0-plugins-base
-        EXTRA_BUILD=python-yapps
-        YAPPS_RUNTIME="python-yapps"
+        #PY3 remove EXTRA_BUILD=python-yapps
+        #PY3 remove YAPPS_RUNTIME="python-yapps"
         ;;
 Debian-9.*|Debian-10|Debian-10.*|Raspbian-9.*|Debian-testing|LinuxMint-19.*|Ubuntu-18.*)
         DOC_DEPENDS="$DOC_DEPENDS, asciidoc-dblatex"

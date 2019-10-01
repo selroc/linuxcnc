@@ -1,18 +1,18 @@
+#PY3testing for buster with python3 as default
+#
 Package: @MAIN_PACKAGE_NAME@
 Conflicts: linuxcnc-sim, @OTHER_MAIN_PACKAGE_NAME@
 Architecture: any
 Recommends: linuxcnc-doc-en | linuxcnc-doc, @EXTRA_RECOMMENDS@
 Depends: ${shlibs:Depends}, @KERNEL_DEPENDS@,
     tcl@TCLTK_VERSION@, tk@TCLTK_VERSION@, bwidget (>= 1.7), libtk-img (>=1.13),
-    python (>= @PYTHON_VERSION@), python (<< @PYTHON_VERSION_NEXT@),
+    python3,
     ${python:Depends}, ${misc:Depends},
-    python@PYTHON_VERSION@-tk,
+    python@PYTHON_VERSION@-tk     | python-tk,
     python@PYTHON_VERSION@-glade2 | python-glade2,
-    python@PYTHON_VERSION@-numpy | python-numpy,
-    @PYTHON_IMAGING@,
-    @PYTHON_IMAGING_TK@,
-    python-gtksourceview2,
-    python-vte,
+    python@PYTHON_VERSION@-numpy  | python-numpy,
+    @PYTHON_IMAGING@ | @PYTHON_IMAGING_TK@ |python3-pil,
+    python3,python3-tk,python3-gi,
     @PYTHON_GST@,
     python-xlib, python-gtkglext1, python-configobj,
     tclreadline, procps, psmisc, module-init-tools | kmod, tclx,
@@ -22,38 +22,44 @@ Description: motion controller for CNC machines and robots
  provides motion control for CNC machine tools and robotic
  applications (milling, cutting, routing, etc.).
 
-Package: linuxcnc-doc-en
-Provides: linuxcnc-doc
-Architecture: all
-Depends: ${misc:Depends}
-Suggests: pdf-viewer
-Description: motion controller for CNC machines and robots (English documentation)
- LinuxCNC is the next-generation Enhanced Machine Controller which
- provides motion control for CNC machine tools and robotic
- applications (milling, cutting, routing, etc.).
- .
- This package contains the documentation in English.
-
-Package: linuxcnc-doc-fr
-Provides: linuxcnc-doc
-Architecture: all
-Depends: ${misc:Depends}
-Suggests: pdf-viewer
-Description: motion controller for CNC machines and robots (French documentation)
- LinuxCNC is the next-generation Enhanced Machine Controller which
- provides motion control for CNC machine tools and robotic
- applications (milling, cutting, routing, etc.).
- .
- This package contains the documentation in French.
-
-Package: linuxcnc-doc-es
-Provides: linuxcnc-doc
-Architecture: all
-Depends: ${misc:Depends}
-Suggests: pdf-viewer
-Description: motion controller for CNC machines and robots (Spanish documentation)
- LinuxCNC is the next-generation Enhanced Machine Controller which
- provides motion control for CNC machine tools and robotic
- applications (milling, cutting, routing, etc.).
- .
- This package contains the documentation in Spanish.
+#
+#PY3tmp buster-python3 only remove from Depends:
+#       python-vte
+#       python-gtksourceview2,
+#
+#PY3tmp
+#Package: linuxcnc-doc-en
+#Provides: linuxcnc-doc
+#Architecture: all
+#Depends: ${misc:Depends}
+#Suggests: pdf-viewer
+#Description: motion controller for CNC machines and robots (English documentation)
+# LinuxCNC is the next-generation Enhanced Machine Controller which
+# provides motion control for CNC machine tools and robotic
+# applications (milling, cutting, routing, etc.).
+# .
+# This package contains the documentation in English.
+#
+#Package: linuxcnc-doc-fr
+#Provides: linuxcnc-doc
+#Architecture: all
+#Depends: ${misc:Depends}
+#Suggests: pdf-viewer
+#Description: motion controller for CNC machines and robots (French documentation)
+# LinuxCNC is the next-generation Enhanced Machine Controller which
+# provides motion control for CNC machine tools and robotic
+# applications (milling, cutting, routing, etc.).
+# .
+# This package contains the documentation in French.
+#
+#Package: linuxcnc-doc-es
+#Provides: linuxcnc-doc
+#Architecture: all
+#Depends: ${misc:Depends}
+#Suggests: pdf-viewer
+#Description: motion controller for CNC machines and robots (Spanish documentation)
+# LinuxCNC is the next-generation Enhanced Machine Controller which
+# provides motion control for CNC machine tools and robotic
+# applications (milling, cutting, routing, etc.).
+# .
+# This package contains the documentation in Spanish.
