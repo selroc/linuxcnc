@@ -1,0 +1,27 @@
+obsolete-xyzac
+
+Uses hal pin motion.switchkins-type to set
+kinematics type.
+
+The switchkins.ngc provides the switchkins
+gcode subroutine to:
+
+  1) Synch prior to kinematicsSwitch()
+     (using M66)
+
+  2) Use M68 (analog output) to set the
+     kinematics type according to parameter #1
+       0 ==> Trivkins
+       1 ==> XYZAC
+
+     A hal net is required to connect the
+     analog out pin N, Example (for N=3):
+
+     net :kinstype-select <= motion.analog-out-03 
+     net :kinstype-select => motion.switchkins-type
+
+  3) Synch after kinematicsSwitch()
+     (using M66)
+
+The switchkins.ngc is typically in a directory
+specified by [RS274NGC]SUBROUTINE_PATH

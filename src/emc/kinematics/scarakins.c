@@ -190,6 +190,7 @@ KINEMATICS_TYPE kinematicsType()
 #define DEFAULT_D5  50
 #define DEFAULT_D6  50
 
+KINS_NOT_SWITCHABLE
 EXPORT_SYMBOL(kinematicsType);
 EXPORT_SYMBOL(kinematicsForward);
 EXPORT_SYMBOL(kinematicsInverse);

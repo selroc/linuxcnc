@@ -208,6 +208,7 @@ typedef struct {
 
     hal_bit_t   *eoffset_active; /* ext offsets active */
     hal_bit_t   *eoffset_limited; /* ext offsets exceed limit */
+    hal_float_t *switchkins_type;
 } emcmot_hal_data_t;
 
 /***********************************************************************

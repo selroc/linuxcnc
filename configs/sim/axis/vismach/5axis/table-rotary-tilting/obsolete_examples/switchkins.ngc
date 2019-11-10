@@ -1,0 +1,20 @@
+; synch, setp motion.switchkins-type, synch again
+
+o<switchkins>sub
+  #<SWITCHKINS_PIN> = 3  ; as required: motion.analog-out-0N
+  ; Requires hal net like:
+  ; net :kinswitch-type  <= motion.analog-out-0N => motion.switchkins-type
+
+  #<kinstype> = #1 ; Input: 0==>trivkins, 1==>xyzac,xyzbc
+
+o<debug1> if [EXISTS [#<_switchkins_debug>]]
+o<debug2>   if [#<_switchkins_debug> GT 0]
+              (debug, switchkins: pin=#<SWITCHKINS_PIN> Type=#<kinstype>)
+o<debug2>   endif
+o<debug1> endif
+
+  M66  E0 L0                           ; force synch
+  M68  E#<SWITCHKINS_PIN> Q#<kinstype> ; set kinstype value
+  M66  E0 L0                           ; force synch
+
+o<switchkins>endsub

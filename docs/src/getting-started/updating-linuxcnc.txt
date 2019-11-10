@@ -1247,6 +1247,15 @@ A homing api is provided by src/emc/motion/homing.h to support users'
 custom homing code that replaces src/emc/motion/homing.c with
 a user-customized homing.c file.
 
+==== Motion
+
+The motion module supports kinematics modules that define kinematicsSwitchable()
+and kinematicsSwitch() to switch their kinematics type.  A hal pin,
+motion.switchkins-type, is provided for use of such kinematics modules.
+
+Kinematics modules that do not support kinematics switching should use
+the macro "KINS_NOT_SWITCHABLE" provided by kinematics.h.
+
 ==== Other
 
 lib/hallib/sim_lib.tcL: simulate encoder index if [JOINT_n]HOME_USE_INDEX

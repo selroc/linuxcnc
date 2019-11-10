@@ -1,0 +1,12 @@
+xyzbc-trt-switchkins
+
+Uses remapped user m codes for kins switch:
+
+  M428: XYZBC (TCP)
+  M429: Trivkins
+
+A hal net is required to connect the
+analog out pin N, Example (for N=3):
+
+  net :kinstype-select <= motion.analog-out-03 
+  net :kinstype-select => motion.switchkins-type

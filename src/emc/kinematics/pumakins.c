@@ -345,6 +345,7 @@ KINEMATICS_TYPE kinematicsType()
 }
 
 
+KINS_NOT_SWITCHABLE
 EXPORT_SYMBOL(kinematicsType);
 EXPORT_SYMBOL(kinematicsForward);
 EXPORT_SYMBOL(kinematicsInverse);

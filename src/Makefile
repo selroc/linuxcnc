@@ -1012,8 +1012,14 @@ rotarydeltakins-objs += libnml/posemath/sincos.o $(MATHSTUB)
 
 obj-m += xyzac-trt-kins.o
 xyzac-trt-kins-objs := emc/kinematics/xyzac-trt-kins.o
+obj-m += xyzac-trt-switchkins.o
+xyzac-trt-switchkins-objs := emc/kinematics/xyzac-trt-switchkins.o
+
 obj-m += xyzbc-trt-kins.o
 xyzbc-trt-kins-objs := emc/kinematics/xyzbc-trt-kins.o
+obj-m += xyzbc-trt-switchkins.o
+xyzbc-trt-switchkins-objs := emc/kinematics/xyzbc-trt-switchkins.o
+
 obj-m += rosekins.o
 rosekins-objs := emc/kinematics/rosekins.o
 
@@ -1136,8 +1142,12 @@ endif
 ../rtlib/pumakins$(MODULE_EXT): $(addprefix objects/rt,$(pumakins-objs))
 ../rtlib/scarakins$(MODULE_EXT): $(addprefix objects/rt,$(scarakins-objs))
 ../rtlib/rotarydeltakins$(MODULE_EXT): $(addprefix objects/rt,$(rotarydeltakins-objs))
+
 ../rtlib/xyzac-trt-kins$(MODULE_EXT): $(addprefix objects/rt,$(xyzac-trt-kins-objs))
+../rtlib/xyzac-trt-switchkins$(MODULE_EXT): $(addprefix objects/rt,$(xyzac-trt-switchkins-objs))
 ../rtlib/xyzbc-trt-kins$(MODULE_EXT): $(addprefix objects/rt,$(xyzbc-trt-kins-objs))
+../rtlib/xyzbc-trt-switchkins$(MODULE_EXT): $(addprefix objects/rt,$(xyzbc-trt-switchkins-objs))
+
 ../rtlib/rosekins$(MODULE_EXT): $(addprefix objects/rt,$(rosekins-objs))
 ../rtlib/scorbot-kins$(MODULE_EXT): $(addprefix objects/rt,$(scorbot-kins-objs))
 ../rtlib/hal_gm$(MODULE_EXT): $(addprefix objects/rt,$(hal_gm-objs))

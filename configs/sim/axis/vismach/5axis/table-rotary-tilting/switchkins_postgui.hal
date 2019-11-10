@@ -1,0 +1,9 @@
+# pyvcp connections (a postgui hal file) for:
+# xyzac-trt-switchkins.ini,xyzbc-trt-switchkins.ini
+
+net :trivkins-button <= pyvcp.trivkins-button => halui.mdi-command-00
+net :tcpkins-button  <= pyvcp.tcpkins-button  => halui.mdi-command-01
+net :vismach-clear   <= pyvcp.vismach-clear   => vismach.plotclear
+
+net :kinstype.is-0   <= kinstype.is-0         => pyvcp.multilabel.0.legend0
+net :kinstype.is-1   <= kinstype.is-1         => pyvcp.multilabel.0.legend1
