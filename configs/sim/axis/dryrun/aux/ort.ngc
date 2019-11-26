@@ -1,0 +1,26 @@
+(info: ort dryrun orient test)
+;Note:
+;  1) dryrun: use sim_pin dhlp.delay
+;             for delay to is-oriented
+;  2) dryrun:
+;       watch dspindle.0.orient
+;       watch dspindle.0.orient-request-in
+;  3) dryrun:
+;       if #<qvalue> < dhlp.delay (default=1)
+;       then expect "TIMED OUT"
+o<ort> sub
+  #<rvalue> = #1 (= 180 positions)
+  #<qvalue> = #2 (=   5 waitsecs)
+   #<dwell> = #3 (=   2 delay before m5)
+
+  m160 ; clear notifications
+
+  (debug, ORIENT test)
+  g0 x0 y0 z0
+  m19 r#<rvalue> q#<qvalue>
+  g4 p#<dwell>
+  m5 ; stop spindle
+  (debug,fini)
+o<ort> endsub
+
+

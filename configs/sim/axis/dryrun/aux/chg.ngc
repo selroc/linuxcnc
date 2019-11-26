@@ -1,0 +1,26 @@
+(info: chg: dryrun tool change test)
+;if sim:
+;   verify hal_manualtoolchange does not run
+
+o<chg> sub
+  #<toolno> = #1 (=1)
+  #<dwell>  = #2 (=1 seconds)
+  m160 ; clear notifications
+
+  g0 x0 y0 z0
+
+  t0m6
+  (debug, unloaded tool: #<_current_tool>)
+  g4 p#<dwell>
+
+  t#<toolno> m6
+  (debug, loaded tool<#<toolno>>: #<_current_tool>)
+  g4 p#<dwell>
+
+  t0m6
+  (debug, unloaded tool: #<_current_tool>)
+
+  (debug, fini)
+o<chg> endsub
+
+

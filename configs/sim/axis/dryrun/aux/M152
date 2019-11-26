@@ -1,0 +1,13 @@
+#!/bin/bash
+
+pgrep halmeter >/dev/null 2>&1
+status=$?
+
+if [ $status -eq 0 ]  ; then
+ echo 
+else
+  halmeter pin motion.digital-out-00 &
+  halmeter pin motion.analog-out-00 &
+fi
+
+exit 0

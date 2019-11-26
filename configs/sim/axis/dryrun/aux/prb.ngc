@@ -1,0 +1,18 @@
+(info: prb dryrun probe input test)
+o<prb> sub
+    #<xstart> = #1 (=0)
+      #<xmax> = #2 (=5)         ;Example parm with no comment
+  #<feedrate> = #3 (=100)
+  g0 x#<xstart> y0 z0
+  f #<feedrate>
+
+  m160 ; clear notifications
+  M150 ; start simulate_probe
+  (debug, PROBE test)
+  (debug, simulate_probe now)
+  g38.2 x#<xmax>
+  (debug, x:#5061)
+  (debug, success:#5070)
+o<prb> endsub
+
+

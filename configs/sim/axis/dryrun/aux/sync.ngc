@@ -1,0 +1,23 @@
+(info: sync dryrun spindle index test)
+o<sync> sub
+    #<zdepth> = #1 (=-1)
+     #<speed> = #2 (=200)
+    #<kvalue> = #3 (=.0625)
+
+  m160 ; clear notifications
+  g0 x0y0z0
+
+  (debug, SPINDLE sync)
+  (debug, spindle on)
+  m3s#<speed>
+
+  (debug, start g33)
+  g33 z#<zdepth>  k#<kvalue>
+  g0 x0y0z0
+
+  (debug, spindle off)
+  m5
+  (debug,fini)
+o<sync> endsub
+
+

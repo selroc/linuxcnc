@@ -1,0 +1,122 @@
+component dryrun_helper
+"""Support of the  dryrun facility.""";
+
+description """
+
+Setup dryrun using the library file: \\fB[HAL]HALFILE=LIB:dryrun_setup.hal\\fR
+
+Make additional (optional) user connections:
+
+Connect the coolant-flood-in, coolant-mist-in pins to \\fBdisable\\fR dryrun
+start up if the respective functions are active.
+
+Connect the tool-number pin to \\fBdisable\\fR dryrun startup if a tool
+is loaded.
+
+Messages are generated for certain actions:
+
+DRYRUN_START_MSG
+
+DRYRUN_STOP_MSG
+
+DRYRUN_TOOL_PREPARED_MSG
+
+DRYRUN_TOOL_CHANGED_MSG
+
+DRYRUN_TOOL_REMAINING_MSG
+
+DRYRUN_LAST_MSG_NUMBER
+
+All messages are enabled by default.  Messages may be
+\\fBdisabled\\fR by setting the appropriate bits on the message-mask
+input pin to 0.  (Ref: include/dryrun.h)
+
+Test sim config: configs/sim/axis/dryrun/dryrun.ini
+
+The pin list below indicates the \\fBexpected\\fR connections to
+system hal pins.
+
+""";
+
+//-------------------------------------------------------------------
+pin in   bit    dryrun_is_active    "<= motion.dryrun-is-active (LIB:setup)";
+pin out  u32    dryrun_inhibit_code "=> motion.dryrun-inhibit-code (LIB:setup)";
+pin in   u32    io_message          "<= iocontrol.0.io-message (LIB:setup)";
+//-------------------------------------------------------------------
+pin in   bit    coolant_flood_in    "<= iocontrol.0.coolant-flood (user optional)";
+pin in   bit    coolant_mist_in     "<= iocontrol.0.coolant-mist (user optional)";
+pin in   s32    tool_number         "<= iocontrol.0.tool-number (user optional)";
+
+pin in   u32    message_mask=0xff   "enable/disable messages (user optional)";
+
+//-------------------------------------------------------------------
+
+function _ fp;
+
+variable hal_bit_t   old_dryrun_is_active;
+variable hal_u32_t   old_io_message;
+
+license "GPL";
+;;
+
+#include "dryrun.h"
+
+FUNCTION(_) {
+
+// --------------------------------------------------------
+// dryrun start inhibits
+    // see dryrun.h for DRYRUN_INHIBIT codes
+    dryrun_inhibit_code = 0;
+    if (!dryrun_is_active) {
+        // Note: if more than one asserted, last one wins
+        if (tool_number != 0) {
+            dryrun_inhibit_code = DRYRUN_INHIBIT_TOOL_LOADED;
+        }
+        if (coolant_flood_in || coolant_mist_in) {
+            dryrun_inhibit_code = DRYRUN_INHIBIT_COOLANT_ON;
+        }
+    }
+
+// --------------------------------------------------------
+// Start,Stop messages
+    if (   (dryrun_is_active && !old_dryrun_is_active)
+        && (DRYRUN_START_MSG & message_mask) ) {
+        rtapi_print_msg(RTAPI_MSG_ERR,
+        "NOTE: Starting dryrun session\n");
+    }
+    if (   (!dryrun_is_active &&  old_dryrun_is_active)
+        && (DRYRUN_STOP_MSG & message_mask) ) {
+        rtapi_print_msg(RTAPI_MSG_ERR,
+        "NOTE: Ending dryrun session\n");
+    }
+
+    old_dryrun_is_active = dryrun_is_active;
+// --------------------------------------------------------
+// io messages
+    if (dryrun_is_active && (io_message != old_io_message)) {
+        if (DRYRUN_TOOL_PREPARED_MSG & io_message & message_mask) {
+            rtapi_print_msg(RTAPI_MSG_ERR,
+            "NOTE: io: dryrun tool prepared\n");
+        }
+        if (DRYRUN_TOOL_CHANGED_MSG & io_message & message_mask) {
+            rtapi_print_msg(RTAPI_MSG_ERR,
+            "NOTE: io: dryrun tool changed\n");
+        }
+        if (   (io_message > DRYRUN_LAST_MSG_NUMBER)
+            && (io_message & message_mask) ) {
+            rtapi_print_msg(RTAPI_MSG_ERR,
+            "NOTE: io: unknown message\n");
+        }
+    }
+    if (!dryrun_is_active && (io_message != old_io_message)) {
+        if (DRYRUN_TOOL_REMAINING_MSG & io_message & message_mask) {
+            rtapi_print_msg(RTAPI_MSG_ERR,
+            "NOTE: io: dryrun tool remaining"
+            "\nUse T0M6 to restore tool status\n");
+        }
+    }
+    old_io_message = io_message;
+// --------------------------------------------------------
+
+    return;
+} // _()

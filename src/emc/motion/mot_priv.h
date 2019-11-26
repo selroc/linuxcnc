@@ -159,6 +159,13 @@ typedef struct {
     hal_bit_t *coord_error;	/* RPA: TRUE if coord mode error */
     hal_bit_t *on_soft_limit;	/* RPA: TRUE if outside a limit */
 
+    hal_bit_t *dryrun_start;       /* experimental input */
+    hal_bit_t *dryrun_stop;        /* experimental input */
+    hal_u32_t *dryrun_inhibit_code;/* experimental input */
+    hal_s32_t *dryrun_speed;       /* experimental input */
+    hal_bit_t *is_dryrun;          /* experimental output */
+    hal_bit_t *isnot_dryrun;       /* experimental output */
+
     hal_s32_t *program_line;    /* RPA: program line causing current motion */
     hal_s32_t *motion_type;	/* RPA: type (feed/rapid) of currently commanded motion */
     hal_float_t *current_vel;   /* RPI: velocity magnitude in machine units */
@@ -260,6 +267,8 @@ extern struct emcmot_error_t *emcmotError;
 extern void emcmotCommandHandler(void *arg, long period);
 extern void emcmotController(void *arg, long period);
 extern void emcmotSetCycleTime(unsigned long nsec);
+extern bool emcmotExternalOffsetsEnabled(void);
+extern bool emcmotSpindleIsOn(void);
 
 /* these are related to synchronized I/O */
 extern void emcmotDioWrite(int index, char value);

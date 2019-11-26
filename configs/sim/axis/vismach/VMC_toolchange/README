@@ -2,8 +2,8 @@ This is a Vismach simulator config intended for testing out tool-changer configu
 The Vismach model combined with the sim_vmc.hal file features three axes
 with home and limit switches, a carousel with both gray-code and pulse/index outputs, 
 a locking bar and a power drawbar. 
-There are two alternative configs, one demonstrating gray-code carousel coding and the other demonstrating
-pulse/index.
+There are alternative configs, one demonstrating gray-code carousel coding and the other demonstrating
+pulse/index. A third config demonstrates how to support a dryrun mode.
 Note that the carousel component also supports straight-binary and individual sensors. 
 
 The "virtual" VMC is created by the sim_vmc.hal file and defines the following signals
@@ -50,6 +50,7 @@ bit1
 bit2
 bit3
 bit4 - Gray-coded carousel position 
+bit5 - True if dryrun (<= motion.is-dryrun)
 
 
 

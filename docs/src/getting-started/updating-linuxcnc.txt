@@ -1247,6 +1247,12 @@ A homing api is provided by src/emc/motion/homing.h to support users'
 custom homing code that replaces src/emc/motion/homing.c with
 a user-customized homing.c file.
 
+==== Dryrun
+
+A dryrun facility is supported by the motion and iocontrol modules
+and a dryrun_helper hal component.  See the integrator/dryrun document
+for information.
+
 ==== Other
 
 lib/hallib/sim_lib.tcL: simulate encoder index if [JOINT_n]HOME_USE_INDEX

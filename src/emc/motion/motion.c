@@ -20,6 +20,7 @@
 #include "mot_priv.h"
 #include "rtapi_math.h"
 #include "homing.h"
+#include "dryrun.h"
 
 // Mark strings for translation, but defer translation to userspace
 #define _(s) (s)
@@ -357,6 +358,13 @@ static int init_hal_io(void)
     if ((retval = hal_pin_bit_newf(HAL_OUT, &(emcmot_hal_data->tp_reverse), mot_comp_id, "motion.tp-reverse")) < 0) goto error;
     if ((retval = hal_pin_bit_newf(HAL_IN, &(emcmot_hal_data->enable), mot_comp_id, "motion.enable")) != 0) goto error;
 
+    if ((retval = hal_pin_bit_newf(HAL_IN, &(emcmot_hal_data->dryrun_start),  mot_comp_id, "motion.dryrun-start"))  != 0) goto error;
+    if ((retval = hal_pin_bit_newf(HAL_IN, &(emcmot_hal_data->dryrun_stop),   mot_comp_id, "motion.dryrun-stop"))   != 0) goto error;
+    if ((retval = hal_pin_bit_newf(HAL_OUT,&(emcmot_hal_data->is_dryrun),     mot_comp_id, "motion.is-dryrun"))     != 0) goto error;
+    if ((retval = hal_pin_bit_newf(HAL_OUT,&(emcmot_hal_data->isnot_dryrun),  mot_comp_id, "motion.isnot-dryrun"))  != 0) goto error;
+    if ((retval = hal_pin_s32_newf(HAL_IN, &(emcmot_hal_data->dryrun_speed),  mot_comp_id, "motion.dryrun-speed"))!= 0) goto error;
+    if ((retval = hal_pin_u32_newf(HAL_IN, &(emcmot_hal_data->dryrun_inhibit_code),mot_comp_id, "motion.dryrun-inhibit-code"))!= 0) goto error;
+
     /* export motion-synched digital output pins */
     /* export motion digital input pins */
     for (n = 0; n < num_dio; n++) {
@@ -432,6 +440,9 @@ static int init_hal_io(void)
     *(emcmot_hal_data->feed_hold) = 0;
     *(emcmot_hal_data->feed_inhibit) = 0;
     *(emcmot_hal_data->homing_inhibit) = 0;
+    *(emcmot_hal_data->is_dryrun) = 0;
+    *(emcmot_hal_data->isnot_dryrun) = 1;
+    *(emcmot_hal_data->dryrun_speed) = 1;
 
     *(emcmot_hal_data->probe_input) = 0;
     /* default value of enable is TRUE, so simple machines
@@ -549,9 +560,15 @@ static int init_hal_io(void)
     if ((retval = hal_pin_bit_newf(HAL_OUT, &(emcmot_hal_data->eoffset_active), mot_comp_id,
                   "motion.eoffset-active")) < 0) goto error;
 
+    if ( (retval = dryrun_setup()) < 0) {
+        rtapi_print_msg(RTAPI_MSG_ERR, _("MOTION: dryrun_setup failed\n"));
+        goto error;
+    }
+
     /* Done! */
     rtapi_print_msg(RTAPI_MSG_INFO,
 	"MOTION: init_hal_io() complete, %d axes.\n", n);
+
     return 0;
 
     error:

@@ -1,0 +1,27 @@
+pin+motion.is-dryrun
+pin+motion.dryrun-inhibit-code
+pin+halui.mode.is-manual
+pin+iocontrol.0.tool-number
+pin+dhlp.elapsedtime
+
+# dmotion:
+pin+dmotion.program-line
+pin+dmotion.tp-reverse
+
+#dspindle:
+pin+dspindle.0.on
+pin+dspindle.0.orient
+pin+dspindle.0.locked
+pin+dspindle.0.speed-out
+pin+dhlp.spindle-index-reset-ct
+
+pin+axis.x.pos-cmd
+pin+joint.0.motor-pos-cmd
+pin+joint.0.motor-pos-fb
+pin+joint.0.f-errored
+
+pin+motion.digital-out-00
+pin+motion.analog-out-00
+pin+motion.digital-in-00
+pin+motion.analog-in-00
+

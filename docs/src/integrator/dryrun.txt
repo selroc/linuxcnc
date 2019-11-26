@@ -1,0 +1,315 @@
+[[cha:Dryrun]]
+
+= Dryrun Facility
+
+== Basics
+
+The dryrun provisions allow the testing of jogging, mdi commands,
+and gcode programs without moving hardware in order to teach,
+demonstrate, or verify expected behavior.
+
+Management of dryrun is controlled by hal pins:
+
+-----
+  IN BIT motion.dryrun-start ---------- request dryrun start
+  IN BIT motion.dryrun-stop ----------- request dryrun stop
+  IN BIT motion.dryrun-inhibit-code --- disallow dryrun start
+  IN S32 motion.dryrun-speed ---------- speed multipler (1..100)
+ OUT BIT motion.is-dryrun ------------- dryrun is active
+ OUT BIT motion.isnot-dryrun ---------- dryrun is not active
+-----
+
+Dryrun is controlled by the start and stop pins.  Startup can be
+inhibited by the inihibit-code pin.  Asserting any non-zero value
+will inhibit startup.  Supported messages are defined in
+include/dryrun.h:
+
+-----
+DRYRUN_INHIBIT_COOLANT_ON
+DRYRUN_INHIBIT_TOOL_LOADED
+DRYRUN_INHIBIT_OTHER
+-----
+
+The dryrun-speed pin can be used to speed up coordinated moves
+during dryrun.  Supported values are 1 to 100. If a zero value is
+present, 1 is used; if a value greater than 100 is present, 100 is
+used.
+
+[NOTE]
+
+The dryrun-speed pin may be useful for observing motion for lengthy
+programs but the 'time-warping' becomes increasingly nonlinear for
+large dryrun-speed values.  This is because the dryrun-speed pin
+forces an increased number of trajectory planning runcycles in each
+servo-thread period and, as a consequence,  the time used in the
+servo-thread increases.  The execution times for coordinated moves
+will scale inversely to the dryrun-speed pin value until the
+computation time used becomes a significant part of the thread
+period.  Nonlinear scaling effects will depend on 1) the
+dryrun-speed pin value, 2) the servo period, 3) the number of hal
+components and their complexity, and 4) the computer processing
+speed.
+
+== Managing dryrun
+
+=== Conditions
+
+. The machine must be turned on and homed before activating the dryrun
+facility.
+
+. Dryrun cannot be started when a program is running in normal mode
+(stop the program first). Similarly, dryrun cannot be stopped when
+running a program (stop the program first). Messages are issued for
+these attempts.
+
+. Dryrun cannot be started if a spindle is on.
+
+. A dryrun session cannot start with external offsets enabled on any
+axis coordinate.
+
+. Unhoming any joint will terminate an active dryrun session.
+
+. Changing from world mode to joint mode will terminate an active dryrun
+session
+
+. External offsets are not supported in dryrun (since no changes in
+motion output pins are allowed).
+
+. Stopping a dryrun session after asserting any external offset
+enabling pin (axis.L.eoffset-enable) will force a machine-off.
+
+. The LinuxCNC *task* mode must be set to *manual* to start or stop
+dryrun.  With the axis gui, this precondition may require selecting
+the manual tab prior to activating motion.dryrun-start or
+motion.dryrun-stop.  (This restriction can be circumvented in custom
+guis by setting the task mode to manual before pulsing the dryrun
+start,stop pins or by pulsing halui.mode.manual)
+
+=== Hal inputs during dryrun
+
+The hal inputs that read *motor feedback position* (joint.N.motor-pos-fb)
+are *not read during dryrun* since all motor position commands
+(joint.N.motor-pos-cmd) are frozen at their state prior to starting
+dryrun.
+
+Other hal input pins are read normally and can be used in dryrun to
+verify proper actions from attached hardware. For example, limit switch
+pins can be activated to verify that the machine turns off.
+
+Motion module input pins for probing, feedrate control, and digital and
+analog inputs are read during dryrun to support testing of hardware
+inputs that may affect gcode programs.
+
+=== Hal outputs during dryrun
+
+During dryrun, *motion module output pins* are, in general, *not
+updated* since they potentially affect hardware.  Motion module output
+pins include all joint motor controls, spindle controls, analog outputs,
+digital outputs, etc.  Disabling these outputs prevents changes to
+connected hardware during dryrun.
+
+The iocontrol module is made aware of dryrun mode by a connection
+to its iocontrol.0.dryrun-is-active input pin.  Iocontrol outputs
+are disabled during dryrun and tool changes are simulated
+internally.
+
+Ancillary guis (like halui) and user component outputs are not
+affected.  If pins from such components are used to control
+hardware, *additional* hal logic is required so that outputs can be
+conditioned by the state of motion.is-dryrun (see below).
+
+A number of supplementary motion *status* output pins are supported
+during dryrun.  These pins reproduce the expected status information
+but use pin names names *dmotion* instead of *motion*:
+
+-----
+dmotion.coord-mode
+dmotion.teleop-mode
+dmotion.motion-type
+dmotion.tp-reverse
+dmotion.program-line
+dmotion.in-position
+dmotion.distance-to-go
+-----
+
+=== Tool handling
+
+Tool changes are managed by the iocontrol module using handshake
+pins:
+
+-----
+OUT: iocontrol.0.tool-prepare
+ IN: iocontrol.0.tool-prepared
+OUT: iocontrol.0.tool-change
+ IN: iocontrol.0.tool-changed
+-----
+
+In dryrun mode, the 'prepared' and 'changed' responses are
+emulated immediately so that gcode programs may continue.
+
+=== Spindle coordination
+
+The gcode/mcode commands that require spindle synchronization (G33,
+G33.1) or spindle orientation (M19) normally require responses
+received on hal pins from spindle controllers.
+
+Spindle synchronizaton uses the pins:
+
+-----
+OUT: spindle.0.on
+OUT: spindle.0.speed-out
+ IN: spindle.0.index-enable
+ IN: spindle.0.at-speed
+ IN: spindle.0.revs
+-----
+
+Spindle orient coordination uses the pins:
+
+-----
+OUT: spindle.0.orient
+OUT: spindle.0.orient-angle
+OUT: spindle.0.orient-mode
+I/O: spindle.0.is-oriented
+-----
+
+In dryrun mode, the IN and I/O pin responses are emulated
+immediately so that gcode programs may continue.
+
+=== Messages
+
+Messages are displayed for important activities
+
+-----
+DRYRUN_START_MSG
+DRYRUN_STOP_MSG
+DRYRUN_TOOL_PREPARED_MSG
+DRYRUN_TOOL_CHANGED_MSG
+DRYRUN_TOOL_REMAINING_MSG
+-----
+
+All messages are enabled by default but individual message types can
+be disabled by clearing the appropriate bit on dryrun_helper
+component message-mask pin.  The message bits are defined in
+include/dryrun.h.
+
+== LIB:dryrun_setup.hal
+
+The library hal file loads the dryrun_helper component (dhlp) and
+creates the *required* hal nets (net names prefixed d:):
+
+-----
+net d:is-dryrun           <= motion.is-dryrun
+net d:is-dryrun           => dhlp.dryrun-is-active
+net d:is-dryrun           => iocontrol.0.dryrun-is-active
+
+net d:dryrun-inhibit-code <= dhlp.dryrun-inhibit-code
+net d:dryrun-inhibit-code => motion.dryrun-inhibit-code
+
+net d:io-message          <= iocontrol.0.dryrun-io-message
+net d:io-message          => dhlp.io-message
+-----
+
+[NOTE]
+
+Additional user hal input pins can be added to the nets
+created by LIB:dryrun_setup.hal in user hal files.
+
+=== dryrun_helper component
+
+The dryrun_helper hal component supports the functions needed to
+implement dryrun.  See the man page (*$ man dryrun_helper*)
+for details.
+
+== Simulator configs
+
+=== dryrun.ini
+
+A simulation config is provided at
+configs/sim/axis/dryrun/dryrun.ini.  This config includes a simple
+virtual (pyvcp) panel with buttons to start or stop dryrun and an
+LED to show dryrun status.  A number of ngcgui subroutines are
+provided in tabs for testing dryrun opertion.
+
+The sim config uses the following ini file settings:
+
+-----
+[HAL]
+HALFILE = LIB:basic_sim.tcl
+HALFILE = LIB:dryrun_setup.hal
+HALFILE = dryrun_user.hal
+POSTGUI_HALFILE = dryrun_postgui.hal
+
+[DISPLAY]
+PYVCP = dryrun.xml
+-----
+
+The LIB:basic_sim.tcl makes a generic sim configuration based on
+other settings in the ini file and requires no hardware.
+
+The LIB:dryrun_setup.hal is *required* to setup the dryrun hal
+configuration.
+
+The dryrun_user.hal file makes *optional* connections to
+disallow dryrun startup if 1) coolants are on or 2) a tool is loaded
+prior to requesting a dryrun start.  The file can also set the
+dryrun_helper message-mask pin to disable selected messages.
+
+The dryrun_postgui.hal and dryrun.xml files make a simple virtual
+panel to start orstop dryrun and display its status.
+
+=== vmc_index_with_dryrun.ini
+
+The sim config
+configs/sim/axis/vismach/VMC_toolchange/vmc_index_with_dryrun.ini
+demonstrates how to incorporate the dryrun facility in a
+configuration that uses remap.
+
+== Hardware configuration
+
+The dryrun facility is added to a machine configuration by including
+the [HAL]HALFILE=LIB:dryrun_setup.hal.  This halfile loads the
+dryrun_helper component and makes mandatory hal connections.
+Additional user options may be included in a custom file
+(dryrun_user.hal).  Provisions for a control panel (virtual or
+physical) are required.
+
+The dryrun facility can be added to a real machine by adapting the
+design demonstrated in the simulation config.  Example ini items:
+
+-----
+[HAL]
+HALFILE = user_machine_1.hal
+...
+HALFILE = user_machine_n.hal
+
+# add library file:
+HALFILE = LIB:dryrun_setup.hal
+
+# add custom files:
+HALFILE = dryrun_user.hal
+POSTGUI_HALFILE = dryrun_postgui.hal
+
+[DISPLAY]
+PYVCP = dryrun.xml
+-----
+
+The dryrun_user.hal file is needed if disabling dryrun startup is
+required when coolant is on or when a tool is loaded. In the 
+example below, 'coolant_on' and 'tool_number' are net names
+created in earlier user_machine_* halfiles:
+
+-----
+net coolant_on  <= iocontrol.0.coolant-flood
+net coolant_on  => dhlp.coolant-flood-in
+
+net tool_number <= iocontrol.0.tool-number
+net tool_number => dhlp.tool-number
+
+setp dhlp.message-mask 0xfc
+-----
+
+The dhlp.message-mask setting disables messages at the start and
+stop of dryrun (see include/dryrun.h for message bit coding).
+
+The dryrun_postgui.hal and dryrun.xml example files copied from the
+sim config can be used as a starting point for panel design.

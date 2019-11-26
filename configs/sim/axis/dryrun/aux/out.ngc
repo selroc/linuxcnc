@@ -1,0 +1,24 @@
+(info: out -- dryrun out pins test)
+; no output change for dryrun allowed
+o<out> sub
+
+m160          ;clear notifications
+m152          ;start halmeters
+
+g0x0y0z0
+
+(debug, dryrun outputs should not change)
+(debug, setting dig-0 to 1)
+m64p0         ;no output for dryrun
+(debug, setting ana-0 to 1.234)
+m68e0q1.234   ;no output for dryrun
+
+(debug, Resume to continue)
+m0
+
+(debug, setting dig-0 to 0)
+m65p0
+(debug, setting ana-0 to 0)
+m68e0q0
+(debug,fini)
+o<out> endsub

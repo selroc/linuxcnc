@@ -30,6 +30,14 @@ The inifile is searched for in the directory from which halcmd was run, unless a
 (Bit, Out) TRUE when mist coolant is requested
 
 .TP
+\fBiocontrol.0.dryrun\-io\-message 
+(U32, Out) dryrun message code (see include/dryrun.h)
+
+.TP
+\fBiocontrol.0.dryrun\-is\-active 
+(Bit, In) from motion.dryrun-is-active
+
+.TP
 \fBiocontrol.0.emc\-enable\-in 
 (Bit, In) Should be driven FALSE when an external estop condition exists.
 

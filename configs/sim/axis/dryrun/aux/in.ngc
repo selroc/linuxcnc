@@ -1,0 +1,17 @@
+(info: in -- dryrun inputs test)
+o<in> sub
+
+  m160 ; clear notifications
+  m151 ; start sim_pin if reqd
+
+  (debug, verify dryrun reading inputs)
+  (debug, set dig-0,ana-0)
+  (debug, resume <S> to continue)
+  m0
+
+  m66p0l0
+  (debug, dig-0: #5399)
+  m66e0l0
+  (debug, ana-0: #5399)
+  (debug, fini)
+o<in> endsub

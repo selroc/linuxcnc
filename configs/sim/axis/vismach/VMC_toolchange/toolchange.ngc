@@ -1,6 +1,13 @@
 
 o<toolchange> sub
 
+M66P5L0 ;check for dryrun
+#<isdryrun> = #5399
+o900 if [#<isdryrun>]
+         (debug, toolchange.ngc: isdryrun)
+o900     return[1]
+o900 endif
+
 M19 R0  ;align the spindle
 
 ; only unload the tool if there is a tool in the spindle

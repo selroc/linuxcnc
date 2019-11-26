@@ -3,6 +3,7 @@ component sim_spindle "Simulated spindle with index pulse";
 pin in float velocity-cmd "Commanded speed";
 pin out float position-fb "Feedback position, in revolutions";
 pin io bit index-enable "Reset \\fBposition-fb\\fP to 0 at the next full rotation";
+pin out s32 index_reset_ct "counter for index reset 1->0 transitions";
 param rw float scale = 1.0 
 """factor applied to \\fBvelocity-cmd\\fP.
 
@@ -24,6 +25,7 @@ FUNCTION(_) {
 
    if(index_enable && (floor(old_position) != floor(new_position))) {
        index_enable = false;
+       index_reset_ct++;
        if(velocity_cmd < 0)
            new_position = new_position - ceil(new_position);
        else

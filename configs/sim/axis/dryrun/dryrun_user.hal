@@ -1,0 +1,25 @@
+# dryrun message-mask (see include/dryrun.h for bit codes)
+# 0xff-->enable all (default), 0x00-->enable none
+# Disable start,stop messages:
+setp dhlp.message-mask 0xfc
+
+#----------------------------------------------------------
+# Optional: disable dryrun startup for:
+#  1) coolant-flood on
+#  2) coolant-mist  on
+#  3) tool loaded
+
+# The following examples use net names starting with 'u:'
+# (Your net names may be different)
+
+# Connect to dhlp.coolant-flood-in to disable dryrun start
+net u:coolant-flood-in <= iocontrol.0.coolant-flood
+net u:coolant-flood-in => dhlp.coolant-flood-in
+
+# Connect to dhlp.coolant-mist-in to disable dryrun start
+net u:coolant-mist-in  <= iocontrol.0.coolant-mist
+net u:coolant-mist-in  => dhlp.coolant-mist-in
+
+# Connect to dhlp.tool-number to disable dryrun start
+net u:tool-number      <= iocontrol.0.tool-number
+net u:tool-number      => dhlp.tool-number

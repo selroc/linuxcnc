@@ -1,0 +1,36 @@
+(info: spiral example)
+o<cone>sub
+     #<radius> = #1 (=   5)
+    #<delta_r> = #2 (=   0.005)
+#<revolutions> = #3 (=  10)
+     #<ystart> = #4 (=   0)
+     #<zstart> = #5 (=   0)
+       #<zmin> = #6 (=  -5)
+   #<feedrate> = #7 (=  20)
+
+      #<xstart> = #<radius>
+  #<iterations> = [#<radius>/#<delta_r>]
+ #<delta_theta> = [#<revolutions>*360/#<iterations>]
+     #<delta_r> = [-abs[#<delta_r>]]
+     #<delta_z> = [#<zmin>/#<iterations>]
+
+m160 ; clear notifications
+(debug, delta_theta=#<delta_theta>)
+(debug, iterations=#<iterations>)
+
+g20 ;inch
+g64 ;blending best possible
+g90 ;absolute distance mode
+
+g0 x#<xstart> y#<ystart> z#<zstart>
+f#<feedrate>
+
+o100 repeat [#<iterations>]
+       g91 ;relative distance mode
+       g1  @#<delta_r> ^#<delta_theta> z#<delta_z>
+o100 endrepeat
+
+g90 ;absolute distance mode
+g0 z#<zstart>
+
+o<cone>endsub

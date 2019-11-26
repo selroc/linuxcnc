@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<pyvcp>
+  <vbox>  
+    <relief>"ridge"</relief>
+    <bd>"5"</bd>
+    <label>
+    <relief>"sunken"</relief>
+      <text>"DRYRUN"</text>
+      <font>("Helvetica",15)</font>
+    </label>
+
+    <button>
+      <halpin>"dryrun-start"</halpin>
+      <text>"Start"</text>
+      <font>("Helvetica",12)</font>
+      <bd>"3"</bd>
+    </button>
+    <button>
+      <halpin>"dryrun-stop"</halpin>
+      <text>"Stop"</text>
+      <font>("Helvetica",12)</font>
+      <bd>"3"</bd>
+    </button>
+
+    <hbox>
+      <rectled>
+        <halpin>"dryrun-led"</halpin>
+        <height>"20"</height>
+        <width>"20"</width>
+        <on_color>"springgreen"</on_color>
+        <off_color>"black"</off_color>
+      </rectled>
+      <label>
+        <text>"  Active"</text>
+        <font>("Helvetica",12)</font>
+      </label>
+    </hbox>
+
+    <hbox>
+      <relief>"ridge"</relief>
+      <bd>"5"</bd>
+      <label>
+        <anchor>"w"</anchor>
+        <text>"Speed:"</text>
+        <font>"bold"</font>
+      </label>
+      <scale>
+        <font>"monospace"</font>
+        <width>"20"</width>
+        <halpin>"speed"</halpin>
+        <resolution>1</resolution>
+        <orient>VERTICAL</orient>
+        <initval>0</initval>
+        <min_>1</min_>
+        <!-- max should be <= 100-->
+        <max_>100</max_>
+        <param_pin>1</param_pin>
+      </scale>
+    </hbox>
+  </vbox>  
+
+  <button>
+    <!-- for convenience -->
+    <halpin>"mode.manual"</halpin>
+    <text>"Force manual mode"</text>
+    <font>("Helvetica",8)</font>
+    <bd>"3"</bd>
+  </button>
+
+</pyvcp>

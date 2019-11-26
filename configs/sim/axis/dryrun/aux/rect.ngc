@@ -1,0 +1,36 @@
+(info: rect -- rectangle loop)
+o<rect> sub
+
+    #<xmax>   = #1  (=  10)
+    #<ymax>   = #2  (=   2)
+    #<zmin>   = #3  (=  -1)
+#<feedrate>   = #4  (= 100)
+#<iterations> = #5  (=   1)
+
+#<maxiterations> = 1000
+m160 ; clear notifications
+
+o10 if [#<iterations> lt 1]
+      #<iterations> =    1
+      (debug, set iterations to #<iterations>)
+o10 endif
+o20 if [#<iterations> gt #<maxiterations>]
+      #<iterations> =    #<maxiterations>
+      (debug, set iterations to #<iterations>)
+o20 endif
+
+#<ct> = 0
+o30 do
+    (debug, ct=#<ct>)
+    g0x0y0z0
+    f#<feedrate>
+    g1z#<zmin>
+    g1x#<xmax>
+    g1y#<ymax>
+    g1x0
+    g1y0
+    g0z0
+    #<ct> = [#<ct> + 1]
+    m160
+o30 while [#<ct> lt #<iterations>]
+o<rect> endsub

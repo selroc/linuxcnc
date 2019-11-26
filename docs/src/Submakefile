@@ -129,6 +129,7 @@ DOC_SRCS_EN := \
 	integrator/steppers.txt \
 	integrator/stepper-timing.txt \
 	integrator/wiring.txt \
+	integrator/dryrun.txt \
 	ladder/classic-ladder.txt \
 	ladder/ladder-examples.txt \
 	ladder/ladder-intro.txt \

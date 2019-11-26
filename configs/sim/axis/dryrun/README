@@ -1,0 +1,38 @@
+dryrun demo
+
+Procedure:
+1) Estop-off  (F1)
+2) Machine-on (F2)
+3) Home-All   (Ctrl-Home)
+4) Control using virtual panel:
+      DRYRUN
+        Start
+        Stop
+5) Observe Preview displays
+   and
+   Halshow Displays
+---------------------------------------
+
+This demo uses a pyvcp panel and
+postgui file:
+  dryrun_postgui.hal
+  dryrun.xml
+
+For a simple test without panels,
+use commandline tools:
+
+$ sim_pin \
+    motion.dryrun-start/mode=Pulse \
+    motion.dryrun-stop/mode=Pulse &
+
+$ halmeter pin motion.is-dryrun &
+
+---------------------------------------
+Or add the following stanza to an existing
+ini file.
+[APPLICATIONS]
+DELAY=5
+APP = sim_pin motion.dryrun-start/mode=Pulse \
+              motion.dryrun-stop/mode=Pulse
+
+APP = halmeter pin motion.is-dryrun

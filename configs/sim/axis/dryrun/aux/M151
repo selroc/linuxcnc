@@ -1,0 +1,13 @@
+#!/bin/bash
+
+pgrep sim_pin >/dev/null 2>&1
+status=$?
+
+if [ $status -eq 0 ]  ; then
+ echo 
+else
+  sim_pin motion.digital-in-00/mode=Toggle \
+          motion.analog-in-00 &
+fi
+
+exit 0

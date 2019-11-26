@@ -1,0 +1,18 @@
+# dryrun: Stand connections to intercept tool management,
+# coolant, lube signals and  substitute using the
+# dryrun_helper component.
+
+loadrt dryrun_helper names=dhlp
+addf   dhlp servo-thread
+
+#----------------------------------------------------------
+# required setup:
+net d:is-dryrun           <= motion.is-dryrun
+net d:is-dryrun           => dhlp.dryrun-is-active
+net d:is-dryrun           => iocontrol.0.dryrun-is-active
+
+net d:dryrun-inhibit-code <= dhlp.dryrun-inhibit-code
+net d:dryrun-inhibit-code => motion.dryrun-inhibit-code
+
+net d:io-message          <= iocontrol.0.dryrun-io-message
+net d:io-message          => dhlp.io-message

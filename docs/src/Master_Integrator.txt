@@ -12,4 +12,6 @@ include::integrator/stepper-timing.txt[]
 
 include::integrator/wiring.txt[]
 
+include::integrator/dryrun.txt[]
+
 // vim: set syntax=asciidoc:

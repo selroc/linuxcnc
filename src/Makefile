@@ -299,6 +299,7 @@ HEADERS := \
     emc/tp/tp_types.h \
     emc/tp/spherical_arc.h \
     emc/tp/blendmath.h \
+    emc/motion/dryrun.h \
     emc/motion/emcmotcfg.h \
     emc/motion/motion.h \
     emc/motion/simple_tp.h \
@@ -1035,6 +1036,7 @@ motmod-objs += emc/motion/simple_tp.o
 motmod-objs += emc/motion/emcmotutil.o
 motmod-objs += emc/motion/stashf.o
 motmod-objs += emc/motion/dbuf.o
+motmod-objs += emc/motion/dryrun.o
 motmod-objs += emc/nml_intf/emcpose.o
 motmod-objs += libnml/posemath/_posemath.o
 motmod-objs += libnml/posemath/sincos.o $(MATHSTUB)

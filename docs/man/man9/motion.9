@@ -105,6 +105,25 @@ These pins are controlled by the M62 through M65 words.
 Distance remaining in the current move
 
 .TP
+\fBmotion.dryrun\-inhibit\-code\fR IN U32
+Inhibit dryrun start if nonzero.
+(standard codes: include/dryrun.h: DRYRUN_INHIBIT_*)
+
+.TP
+\fBmotion.dryrun\-speed\fR IN s32
+Synthesized dryrun speed. (0<= value <= 100)
+If 0, use 1. If >100, use 100.
+( dryrun.h: DRYRUN_MAX_RUNCYCLES)
+
+.TP
+\fBmotion.dryrun\-start\fR IN BIT
+Pulse to request dryrun start
+
+.TP
+\fBmotion.dryrun\-stop\fR IN BIT
+Pulse to request dryrun stop
+
+.TP
 \fBmotion.enable\fR IN BIT
 If this bit is driven FALSE, motion stops, the machine is placed in the "machine off" state, and a message is displayed for the operator. For normal motion, drive this bit TRUE.
 
@@ -147,6 +166,14 @@ mode whenever motion is enabled.
 \fBmotion.in\-position\fR OUT BIT
 TRUE if the machine is in position (ie, not currently moving towards
 the commanded position).
+
+.TP
+\fBmotion.is\-dryrun\fR OUT BIT
+TRUE if dryrun is active
+
+.TP
+\fBmotion.isnot\-dryrun\fR OUT BIT
+TRUE if dryrun is not active
 
 .TP
 \fBmotion.motion\-enabled\fR OUT BIT

@@ -1,0 +1,7 @@
+#!/bin/bash
+
+halcmd setp axisui.notifications-clear 1
+sleep .1
+halcmd setp axisui.notifications-clear 0
+
+exit 0

@@ -1,0 +1,12 @@
+#!/bin/bash
+
+pgrep simulate_probe >/dev/null 2>&1
+status=$?
+
+if [ $status -eq 0 ]  ; then
+ echo 
+else
+  simulate_probe &
+fi
+
+exit 0

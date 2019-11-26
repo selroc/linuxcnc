@@ -69,6 +69,58 @@
 #include "timer.hh"
 #include "rcs_print.hh"
 #include "tool_parse.h"
+#include "dryrun.h"
+
+//NOTE: if isdryrun, no outputs are changed
+static bool isdryrun;
+static bool old_isdryrun;
+static bool dryrun_tool_prepare;
+static bool dryrun_tool_change;
+static bool dryrun_tool_number;
+
+#define SET_MIST(value)  do {if (!isdryrun) { \
+                               emcioStatus.coolant.mist        = value;  \
+                               *(iocontrol_data->coolant_mist) = value;} \
+                         } while(0)
+
+#define SET_FLOOD(value) do {if (!isdryrun) { \
+                               emcioStatus.coolant.flood        = value;  \
+                               *(iocontrol_data->coolant_flood) = value;} \
+                         } while(0)
+
+#define SET_LUBE(value)  do {if (!isdryrun) { \
+                               emcioStatus.lube.on     = value;  \
+                               *(iocontrol_data->lube) = value;} \
+                         } while(0)
+
+#define SET_TOOL_PREPARE(value)  do {if (!isdryrun) { \
+                                       *(iocontrol_data->tool_prepare) = value; \
+                                    } else { \
+                                       dryrun_tool_prepare = value;\
+                                    } \
+                                 } while(0)
+
+#define SET_TOOL_CHANGE(value)  do {if (!isdryrun) { \
+                                       *(iocontrol_data->tool_change) = value; \
+                                    } else { \
+                                       dryrun_tool_change = value;\
+                                    } \
+                                 } while(0)
+
+#define SET_TOOL_NUMBER(value)  do {if (!isdryrun) { \
+                                      *(iocontrol_data->tool_number) = value; \
+                                   }  else { \
+                                      dryrun_tool_number = value; \
+                                   } \
+                                 } while(0)
+
+#define SET_TOOL_PREP_NUMBER(value)  do {if (!isdryrun) { \
+                                      *(iocontrol_data->tool_prep_number) = value;} \
+                                 } while(0)
+
+#define SET_TOOL_PREP_POCKET(value)  do {if (!isdryrun) { \
+                                      *(iocontrol_data->tool_prep_pocket) = value;} \
+                                 } while(0)
 
 static RCS_CMD_CHANNEL *emcioCommandBuffer = 0;
 static RCS_CMD_MSG *emcioCommand = 0;
@@ -89,6 +141,8 @@ struct iocontrol_str {
     hal_bit_t *lube;		/* lube output pin */
     hal_bit_t *lube_level;	/* lube level input pin */
 
+    hal_bit_t *dryrun_is_active; //in
+    hal_u32_t *dryrun_io_message;//out
 
     // the following pins are needed for toolchanging
     //tool-prepare
@@ -445,6 +499,24 @@ int iocontrol_hal_init(void)
 	hal_exit(comp_id);
 	return -1;
     }
+    retval = hal_pin_bit_newf(HAL_IN, &(iocontrol_data->dryrun_is_active), comp_id,
+			     "iocontrol.%d.dryrun-is-active", n);
+    if (retval < 0) {
+	rtapi_print_msg(RTAPI_MSG_ERR,
+			"IOCONTROL: ERROR: iocontrol %d pin dryrun-is-active export failed with err=%i\n",
+			n, retval);
+	hal_exit(comp_id);
+	return -1;
+    }
+    retval = hal_pin_u32_newf(HAL_OUT, &(iocontrol_data->dryrun_io_message), comp_id,
+			     "iocontrol.%d.dryrun-io-message", n);
+    if (retval < 0) {
+	rtapi_print_msg(RTAPI_MSG_ERR,
+			"IOCONTROL: ERROR: iocontrol %d pin dryrun-io-message export failed with err=%i\n",
+			n, retval);
+	hal_exit(comp_id);
+	return -1;
+    }
     // lube_level
     retval = hal_pin_bit_newf(HAL_IN, &(iocontrol_data->lube_level), comp_id,
 			     "iocontrol.%d.lube_level", n);
@@ -501,6 +573,17 @@ void hal_init_pins(void)
 int read_hal_inputs(void)
 {
     int oldval, retval = 0;
+
+    isdryrun = *(iocontrol_data->dryrun_is_active);
+    if (!isdryrun && old_isdryrun && (dryrun_tool_number != 0) ) {
+        *iocontrol_data->dryrun_io_message = DRYRUN_TOOL_REMAINING_MSG;
+    }
+    if (!isdryrun) {
+        dryrun_tool_prepare = 0;
+        dryrun_tool_change  = 0;
+        dryrun_tool_number  = 0;
+    }
+    old_isdryrun = isdryrun;
 
     oldval = emcioStatus.aux.estop;
 
@@ -580,28 +663,36 @@ void reload_tool_number(int toolno) {
 ********************************************************************/
 int read_tool_inputs(void)
 {
-    if (*iocontrol_data->tool_prepare && *iocontrol_data->tool_prepared) {
+    if (   (!isdryrun && *iocontrol_data->tool_prepare && *iocontrol_data->tool_prepared)
+        || ( isdryrun && dryrun_tool_prepare) ) {
 	emcioStatus.tool.pocketPrepped = iocontrol_data->tool_prep_index; //check if tool has been prepared
-	*(iocontrol_data->tool_prepare) = 0;
+	SET_TOOL_PREPARE(0);
 	emcioStatus.status = RCS_DONE;  // we finally finished to do tool-changing, signal task with RCS_DONE
+        if (isdryrun) {
+            *iocontrol_data->dryrun_io_message = DRYRUN_TOOL_PREPARED_MSG;
+        }
 	return 10; //prepped finished
     }
-    
-    if (*iocontrol_data->tool_change && *iocontrol_data->tool_changed) {
+
+    if (   (!isdryrun && *iocontrol_data->tool_change && *iocontrol_data->tool_changed)
+        || ( isdryrun && dryrun_tool_change) ) {
         if(!random_toolchanger && emcioStatus.tool.pocketPrepped == 0) {
             emcioStatus.tool.toolInSpindle = 0;
         } else {
             // the tool now in the spindle is the one that was prepared
             emcioStatus.tool.toolInSpindle = emcioStatus.tool.toolTable[emcioStatus.tool.pocketPrepped].toolno; 
         }
-	*(iocontrol_data->tool_number) = emcioStatus.tool.toolInSpindle; //likewise in HAL
+	SET_TOOL_NUMBER(emcioStatus.tool.toolInSpindle); //likewise in HAL
 	load_tool(emcioStatus.tool.pocketPrepped);
 	emcioStatus.tool.pocketPrepped = -1; //reset the tool preped number, -1 to permit tool 0 to be loaded
-	*(iocontrol_data->tool_prep_number) = 0; //likewise in HAL
-	*(iocontrol_data->tool_prep_pocket) = 0; //likewise in HAL
+        SET_TOOL_PREP_NUMBER(0); //likewise in HAL
+        SET_TOOL_PREP_POCKET(0); //likewise in HAL
 	iocontrol_data->tool_prep_index = 0; //likewise in HAL
-	*(iocontrol_data->tool_change) = 0; //also reset the tool change signal
+	SET_TOOL_CHANGE(0);
 	emcioStatus.status = RCS_DONE;	// we finally finished to do tool-changing, signal task with RCS_DONE
+        if (isdryrun) {
+            *iocontrol_data->dryrun_io_message = DRYRUN_TOOL_CHANGED_MSG;
+        }
 	return 11; //change finished
     }
     return 0;
@@ -718,6 +809,10 @@ int main(int argc, char *argv[])
     *(iocontrol_data->tool_number) = emcioStatus.tool.toolInSpindle;
 
     while (!done) {
+    if (*iocontrol_data->dryrun_io_message) {
+        // clear last message
+        *iocontrol_data->dryrun_io_message = 0;
+    }
 	// check for inputs from HAL (updates emcioStatus)
 	// returns 1 if any of the HAL pins changed from the last time we checked
 	/* if an external ESTOP is activated (or another hal-pin has changed)
@@ -783,12 +878,10 @@ int main(int argc, char *argv[])
 	    // this gets sent on any Task Abort, so it might be safer to stop
 	    // the spindle  and coolant
 	    rtapi_print_msg(RTAPI_MSG_DBG, "EMC_TOOL_ABORT\n");
-	    emcioStatus.coolant.mist = 0;
-	    emcioStatus.coolant.flood = 0;
-	    *(iocontrol_data->coolant_mist)=0;		/* coolant mist output pin */
-	    *(iocontrol_data->coolant_flood)=0;		/* coolant flood output pin */
-	    *(iocontrol_data->tool_change)=0;		/* abort tool change if in progress */
-	    *(iocontrol_data->tool_prepare)=0;		/* abort tool prepare if in progress */
+	    SET_MIST(0);
+	    SET_FLOOD(0);
+	    SET_TOOL_CHANGE(0);
+	    SET_TOOL_PREPARE(0);
 	    break;
 
 	case EMC_TOOL_PREPARE_TYPE:
@@ -799,12 +892,12 @@ int main(int argc, char *argv[])
 
                 // Set HAL pins/params for tool number, pocket, and index.
                 iocontrol_data->tool_prep_index = p;
-                *(iocontrol_data->tool_prep_pocket) = random_toolchanger? p: emcioStatus.tool.toolTable[p].pocketno;
+                SET_TOOL_PREP_POCKET(random_toolchanger? p: emcioStatus.tool.toolTable[p].pocketno);
                 if(!random_toolchanger && p == 0) {//unload spindle
-                    *(iocontrol_data->tool_prep_number) = 0;
-					*(iocontrol_data->tool_prep_pocket) = 0;
+                    SET_TOOL_PREP_NUMBER(0);
+                    SET_TOOL_PREP_POCKET(0);
                 } else {
-                    *(iocontrol_data->tool_prep_number) = emcioStatus.tool.toolTable[p].toolno;
+                    SET_TOOL_PREP_NUMBER(emcioStatus.tool.toolTable[p].toolno);
                 }
 
                 // it doesn't make sense to prep the spindle pocket
@@ -814,7 +907,7 @@ int main(int argc, char *argv[])
                 }
 
                 /* then set the prepare pin to tell external logic to get started */
-                *(iocontrol_data->tool_prepare) = 1;
+                SET_TOOL_PREPARE(1);
                 // the feedback logic is done inside read_hal_inputs()
                 // we only need to set RCS_EXEC if RCS_DONE is not already set by the above logic
                 if (tool_status != 10) //set above to 10 in case PREP already finished (HAL loopback machine)
@@ -838,7 +931,7 @@ int main(int argc, char *argv[])
 
 	    if (emcioStatus.tool.pocketPrepped != -1) {
 		//notify HW for toolchange
-		*(iocontrol_data->tool_change) = 1;
+		SET_TOOL_CHANGE(1);
 		// the feedback logic is done inside read_hal_inputs() we only
 		// need to set RCS_EXEC if RCS_DONE is not already set by the
 		// above logic
@@ -910,33 +1003,29 @@ int main(int argc, char *argv[])
 		rtapi_print_msg(RTAPI_MSG_DBG, "EMC_TOOL_SET_NUMBER old_loaded_tool=%d new_pocket_number=%d new_tool=%d\n", emcioStatus.tool.toolInSpindle, pocket_number, emcioStatus.tool.toolTable[pocket_number].toolno);
                 load_tool(pocket_number);
 		emcioStatus.tool.toolInSpindle = emcioStatus.tool.toolTable[pocket_number].toolno;
-		*(iocontrol_data->tool_number) = emcioStatus.tool.toolInSpindle; //likewise in HAL
+		SET_TOOL_NUMBER(emcioStatus.tool.toolInSpindle); //likewise in HAL
 	    }
 	    break;
 
 
 	case EMC_COOLANT_MIST_ON_TYPE:
 	    rtapi_print_msg(RTAPI_MSG_DBG, "EMC_COOLANT_MIST_ON\n");
-	    emcioStatus.coolant.mist = 1;
-	    *(iocontrol_data->coolant_mist) = 1;
+	    SET_MIST(1);
 	    break;
 
 	case EMC_COOLANT_MIST_OFF_TYPE:
 	    rtapi_print_msg(RTAPI_MSG_DBG, "EMC_COOLANT_MIST_OFF\n");
-	    emcioStatus.coolant.mist = 0;
-	    *(iocontrol_data->coolant_mist) = 0;
+	    SET_MIST(0);
 	    break;
 
 	case EMC_COOLANT_FLOOD_ON_TYPE:
 	    rtapi_print_msg(RTAPI_MSG_DBG, "EMC_COOLANT_FLOOD_ON\n");
-	    emcioStatus.coolant.flood = 1;
-	    *(iocontrol_data->coolant_flood) = 1;
+	    SET_FLOOD(1);
 	    break;
 
 	case EMC_COOLANT_FLOOD_OFF_TYPE:
 	    rtapi_print_msg(RTAPI_MSG_DBG, "EMC_COOLANT_FLOOD_OFF\n");
-	    emcioStatus.coolant.flood = 0;
-	    *(iocontrol_data->coolant_flood) = 0;
+	    SET_FLOOD(0);
 	    break;
 
 	case EMC_AUX_ESTOP_ON_TYPE:
@@ -962,14 +1051,12 @@ int main(int argc, char *argv[])
 
 	case EMC_LUBE_ON_TYPE:
 	    rtapi_print_msg(RTAPI_MSG_DBG, "EMC_LUBE_ON\n");
-	    emcioStatus.lube.on = 1;
-	    *(iocontrol_data->lube) = 1;
+	    SET_LUBE(1);
 	    break;
 
 	case EMC_LUBE_OFF_TYPE:
 	    rtapi_print_msg(RTAPI_MSG_DBG, "EMC_LUBE_OFF\n");
-	    emcioStatus.lube.on = 0;
-	    *(iocontrol_data->lube) = 0;
+	    SET_LUBE(0);
 	    break;
 
 	case EMC_SET_DEBUG_TYPE:

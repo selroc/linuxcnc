@@ -1,0 +1,17 @@
+#--------------------------------------------
+# postgui nets (p:):
+setp pyvcp.scale.0.param_pin 1
+net p:dryrun-start <= pyvcp.dryrun-start
+net p:dryrun-start => motion.dryrun-start
+net p:dryrun-stop  <= pyvcp.dryrun-stop
+net p:dryrun-stop  => motion.dryrun-stop
+net p:dryrun-speed <= pyvcp.speed-i
+net p:dryrun-speed => motion.dryrun-speed
+# for convenience with axis gui:
+net P:mode.manual  <= pyvcp.mode.manual
+net P:mode.manual  => halui.mode.manual
+
+#--------------------------------------------
+# add to net created by dryrun_setup.hal:
+net d:is-dryrun    => pyvcp.dryrun-led
+
