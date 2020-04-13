@@ -1,3 +1,5 @@
+[[cha:qtvcp-code]]
+
 = QTvcp Handler file code snippets
 
 Here are bits of ideas to put in the handler file. +
@@ -142,18 +144,8 @@ Loads the toolbar library.
 in the 'INSTANTIATE LIBRARY' Section add:
 [source,python]
 ----
-TOOLBAR = None
+TOOLBAR = ToolBarActions()
 ----
-Make a global variable
-
-In the 'INITIALIZE SECTION'
-Under the 'def \_\_init__.(self, halcomp, widgets, paths):' function add: +
-[source,python]
-----
-        global TOOLBAR
-        TOOLBAR = ToolBarActions(path=paths)
-----
-
 In the 'SPECIAL FUNCTIONS SECTION'
 Under the 'def initialized__(self):' function add: +
 [source,python]
@@ -173,3 +165,73 @@ In the 'GENERAL FUNCTIONS SECTION' ADD: +
 ----
 The function to be called if the actionMyFunction button is pressed.
 
+== Add HAL Pins that call functions
+In this way you don't need to poll the state of input pins. +
+under the initialised__ function, make sure there is an entry similar to this: +
+[source,python]
+----
+    ##########################################
+    # Special Functions called from QTVCP
+    ##########################################
+
+    # at this point:
+    # the widgets are instantiated.
+    # the HAL pins are built but HAL is not set ready
+    def initialized__(self):
+        self.pin_cycle_start_in = self.hal.newpin('cycle-start-in',hal.HAL_BIT, hal.HAL_IN)
+        self.pin_cycle_start_in.value_changed.connect(lambda s: self.cycleStart(s))
+----
+
+Add a function that gets called when the pin state changes. +
+This function assumes there is a Tab widget named 'mainTab' +
+that has tabs with the names 'tab_auto', 'tab_graphics', +
+'tab_filemanager' and 'tab_mdi'. In this way the cycle start +
+button works differently depending on what tab is showing. +
+This is simplified - checking state and error trapping might +
+be helpful. +
+
+In the 'GENERAL FUNCTIONS SECTION' add:
+[source,python]
+----
+    #####################
+    # general functions #
+    #####################
+
+    def cycleStart(self, state):
+        if state:
+            tab = self.w.mainTab.currentWidget()
+            if  tab in( self.w.tab_auto,  self.w.tab_graphics):
+                ACTION.RUN(line=0)
+            elif tab == self.w.tab_files:
+                    self.w.filemanager.load()
+            elif tab == self.w.tab_mdi:
+                self.w.mditouchy.run_command()
+----
+
+== Add a special Max Velocity Slider based on percent
+Some times you want to build a widget to do something not built in. +
+The built in Max velocity slider acts on units per minute, here we show how to do percent: +
+The STATUS command makes sure the slider adjusts if linuxcnc changes the current max velocity. +
+valueChanged.connect() calls a function when the slider is moved. +
+
+In Designer add a QSlider widget called 'mvPercent'
+Then add the code to the handler file.
+[source,python]
+----
+    #############################
+    # SPECIAL FUNCTIONS SECTION #
+    #############################
+
+    def initialized__(self):
+        self.w.mvPercent.setMaximum(100)
+        STATUS.connect('max-velocity-override-changed', lambda w, data: self.w.mvPercent.setValue((data / INFO.MAX_TRAJ_VELOCITY)*100))
+        self.w.mvPercent.valueChanged.connect(self.setMVPercentValue)
+
+    #####################
+    # GENERAL FUNCTIONS #
+    #####################
+
+   def setMVPercentValue(self, value):
+        ACTION.SET_MAX_VELOCITY_RATE(INFO.MAX_TRAJ_VELOCITY * (value/100.0))
+
+----

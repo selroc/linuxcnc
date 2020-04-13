@@ -3,7 +3,7 @@
 '''
 plasmac_config.py
 
-Copyright (C) 2019  Phillip A Carter
+Copyright (C) 2019, 2020  Phillip A Carter
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the
@@ -44,24 +44,24 @@ class HandlerClass:
         # configure  = (value, lower limit, upper limit, step size, 0, 0)
         self.builder.get_object('arc-fail-delay').set_digits(1)
         self.builder.get_object('arc-fail-delay-adj').configure(3,0.1,60,0.1,0,0)
-        self.builder.get_object('arc-ok-low').set_digits(1)
-        self.builder.get_object('arc-ok-low-adj').configure(0,0,200,0.5,0,0)
-        self.builder.get_object('arc-ok-high').set_digits(1)
-        self.builder.get_object('arc-ok-high-adj').configure(0,0,200,0.5,0,0)
+        self.builder.get_object('arc-ok-low').set_digits(0)
+        self.builder.get_object('arc-ok-low-adj').configure(30,0,100,1,0,0)
+        self.builder.get_object('arc-ok-high').set_digits(0)
+        self.builder.get_object('arc-ok-high-adj').configure(99999,0,99999,1,0,0)
         self.builder.get_object('arc-max-starts').set_digits(0)
         self.builder.get_object('arc-max-starts-adj').configure(3,1,9,1,0,0)
         self.builder.get_object('arc-restart-delay').set_digits(0)
         self.builder.get_object('arc-restart-delay-adj').configure(3,1,60,1,0,0)
-        self.builder.get_object('arc-voltage-offset').set_digits(2)
-        self.builder.get_object('arc-voltage-offset-adj').configure(0,-999999,999999,0.01,0,0)
+        self.builder.get_object('arc-voltage-offset').set_digits(3)
+        self.builder.get_object('arc-voltage-offset-adj').configure(0,-999999,999999,0.001,0,0)
         self.builder.get_object('arc-voltage-scale').set_digits(6)
         self.builder.get_object('arc-voltage-scale-adj').configure(1,-9999,9999,0.000001,0,0)
-        self.builder.get_object('centre-spot-threshold').set_digits(1)
-        self.builder.get_object('centre-spot-threshold-adj').configure(0,0,199,0.1,0,0)
-        self.builder.get_object('centre-spot-threshold').set_value(0.0)
-        self.builder.get_object('centre-spot-time').set_digits(0)
-        self.builder.get_object('centre-spot-time-adj').configure(0,0,9999,1,0,0)
-        self.builder.get_object('centre-spot-time').set_value(0)
+        self.builder.get_object('spotting-threshold').set_digits(1)
+        self.builder.get_object('spotting-threshold-adj').configure(0,0,199,0.1,0,0)
+        self.builder.get_object('spotting-threshold').set_value(0.0)
+        self.builder.get_object('spotting-time').set_digits(0)
+        self.builder.get_object('spotting-time-adj').configure(0,0,9999,1,0,0)
+        self.builder.get_object('spotting-time').set_value(0)
         self.builder.get_object('cornerlock-threshold').set_digits(0)
         self.builder.get_object('cornerlock-threshold-adj').configure(90,1,99,1,0,0)
         self.builder.get_object('kerfcross-override').set_digits(0)
@@ -80,8 +80,8 @@ class HandlerClass:
         self.builder.get_object('pid-d-gain').set_value(0)
         self.builder.get_object('scribe-arm-delay').set_digits(1)
         self.builder.get_object('scribe-arm-delay-adj').configure(0,0,9,0.1,0,0)
-        self.builder.get_object('scribe-start-delay').set_digits(1)
-        self.builder.get_object('scribe-start-delay-adj').configure(0,0,9,0.1,0,0)
+        self.builder.get_object('scribe-on-delay').set_digits(1)
+        self.builder.get_object('scribe-on-delay-adj').configure(0,0,9,0.1,0,0)
         self.builder.get_object('thc-delay').set_digits(1)
         self.builder.get_object('thc-delay-adj').configure(1.5,0,9,0.1,0,0)
         self.builder.get_object('thc-threshold').set_digits(2)

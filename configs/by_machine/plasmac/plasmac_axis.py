@@ -219,15 +219,15 @@ w('bind',fjogf + '.jog.jogminus','<ButtonRelease-1>','if [is_continuous] {jog_st
 w('button',fjogf + '.jog.jogplus','-command','if ![is_continuous] {jog_plus 1}','-height','1','-text','+')
 w('bind',fjogf + '.jog.jogplus','<Button-1>','if [is_continuous] {jog_plus}')
 w('bind',fjogf + '.jog.jogplus','<ButtonRelease-1>','if [is_continuous] {jog_stop}')
-w('combobox',fjogf + '.jog.jogincr','-editable','0','-textvariable','jogincrement','-value','Continuous','-width','10')
-w(fjogf + '.jog.jogincr','list','insert','end','Continuous')
+w('combobox',fjogf + '.jog.jogincr','-editable','0','-textvariable','jogincrement','-value',_('Continuous'),'-width','10')
+w(fjogf + '.jog.jogincr','list','insert','end',_('Continuous'))
 if increments:
     w(fjogf + '.jog.jogincr','list','insert','end',*increments)
 w('labelframe',fjogf + '.zerohome','-text','Zero','-relief','flat')
 w('button',fjogf + '.zerohome.home','-command','home_joint','-height','1')
-w('setup_widget_accel',fjogf + '.zerohome.home','Home Axis')
+w('setup_widget_accel',fjogf + '.zerohome.home',_('Home Axis'))
 w('button',fjogf + '.zerohome.zero','-command','touch_off_system','-height','1')
-w('setup_widget_accel',fjogf + '.zerohome.zero','Touch Off')
+w('setup_widget_accel',fjogf + '.zerohome.zero',_('Touch Off'))
 # unused, just for tcl hierarchy
 w('button',fjogf + '.zerohome.tooltouch')
 w('checkbutton',fjogf + '.override')
@@ -252,7 +252,7 @@ if homing_order_defined:
         hbName = 'axes'
     else:
         hbName ='joints'
-    widgets.homebutton.configure(text = 'Home All', command = 'home_all_joints')
+    widgets.homebutton.configure(text = _('Home All'), command = 'home_all_joints')
     w('DynamicHelp::add',fjogf + '.zerohome.home','-text','Home all %s [Ctrl-Home]' % hbName)
 else:
     w('DynamicHelp::add',fjogf + '.zerohome.home','-text','Home selected %s [Home]' % ja_name.lower())
@@ -312,9 +312,7 @@ w('pack',fpausedmotion + '.forward','-side','right','-fill','y')
 w('DynamicHelp::add',fpausedmotion + '.reverse','-text','Move while paused\nin reverse direction')
 w('DynamicHelp::add',fpausedmotion + '.forward','-text','Move while paused\nin foward direction')
 w('DynamicHelp::add',fpausedmotion + '.paused-motion-speed','-text','Paused motion speed (% of feed rate)')
-# only show paused motion if LinuxCNC version 2.9 or later
-if int(linuxcnc.version.split('.')[0] + linuxcnc.version.split('.')[1]) >= 29:
-    w('grid',fpausedmotion,'-column','0','-row','4','-columnspan','1','-padx','4','-pady','2 0','-sticky','ew')
+w('grid',fpausedmotion,'-column','0','-row','4','-columnspan','1','-padx','4','-pady','2 0','-sticky','ew')
 
 # hide bottom pane until modified
 w('pack','forget','.pane.bottom.t.text')

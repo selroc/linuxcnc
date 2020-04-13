@@ -140,7 +140,8 @@ class ActionButton(Indicated_PushButton, _HalWidgetBase):
         def _safecheck(state, data=None):
             self._block_signal = True
             self.setChecked(state)
-            if self._HAL_pin is False:
+            # update indicator if halpin or status doesn't
+            if self._HAL_pin is False and self._ind_status is False:
                 self.indicator_update(state)
             # if using state labels option update the labels
             if self._state_text:
@@ -170,7 +171,9 @@ class ActionButton(Indicated_PushButton, _HalWidgetBase):
                     and (STATUS.is_all_homed() or INFO.NO_HOME_REQUIRED))
 
         def limits_override_test(data):
-            if data:
+            if STATUS.is_homing():
+                return
+            elif data:
                 self.setEnabled(True)
             else:
                 self.setEnabled(False)
@@ -466,9 +469,9 @@ class ActionButton(Indicated_PushButton, _HalWidgetBase):
             self._toggle_state = self._toggle_state * -1
         elif self.spindle_over:
             if self.toggle_float and not self._toggle_state:
-                ACTION.SET_SPINDLE_RATE(self.float_alt)
+                ACTION.SET_SPINDLE_RATE(self.float_alt,self.joint)
             else:
-                ACTION.SET_SPINDLE_RATE(self.float)
+                ACTION.SET_SPINDLE_RATE(self.float,self.joint)
             self._toggle_state -= 1
             self._toggle_state = self._toggle_state * -1
         elif self.view_change:
@@ -476,25 +479,40 @@ class ActionButton(Indicated_PushButton, _HalWidgetBase):
                  STATUS.emit('reload-display')
             else:
                 try:
-                    STATUS.emit('graphics-view-changed', '%s' % self.view_type)
-                except:
+                    ACTION.SET_GRAPHICS_VIEW(self.view_type)
+                except Exception as e:
+                    print e
                     pass
         elif self.spindle_fwd:
-            ACTION.SET_SPINDLE_ROTATION(linuxcnc.SPINDLE_FORWARD, INFO.DEFAULT_SPINDLE_SPEED)
+            ACTION.SET_SPINDLE_ROTATION(linuxcnc.SPINDLE_FORWARD, INFO.DEFAULT_SPINDLE_SPEED,self.joint)
         elif self.spindle_rev:
-            ACTION.SET_SPINDLE_ROTATION(linuxcnc.SPINDLE_REVERSE, INFO.DEFAULT_SPINDLE_SPEED)
+            ACTION.SET_SPINDLE_ROTATION(linuxcnc.SPINDLE_REVERSE, INFO.DEFAULT_SPINDLE_SPEED,self.joint)
         elif self.spindle_stop:
-            ACTION.SET_SPINDLE_STOP()
+            ACTION.SET_SPINDLE_STOP(self.joint)
         elif self.spindle_up:
-            if STATUS.is_spindle_on():
-                ACTION.SET_SPINDLE_FASTER()
+            if self.joint == -1:
+                a = 0
+                b = INFO.AVAILABLE_SPINDLES
             else:
-                ACTION.SET_SPINDLE_ROTATION(linuxcnc.SPINDLE_FORWARD, INFO.DEFAULT_SPINDLE_SPEED)
+                a = self.joint
+                b = self.joint +1
+            for i in range(a,b):
+                if STATUS.is_spindle_on(i):
+                    ACTION.SET_SPINDLE_FASTER(i)
+                else:
+                    ACTION.SET_SPINDLE_ROTATION(linuxcnc.SPINDLE_FORWARD, INFO.DEFAULT_SPINDLE_SPEED,i)
         elif self.spindle_down:
-            if STATUS.is_spindle_on():
-                ACTION.SET_SPINDLE_SLOWER()
+            if self.joint ==-1:
+                a = 0
+                b = INFO.AVAILABLE_SPINDLES
             else:
-                ACTION.SET_SPINDLE_ROTATION(linuxcnc.SPINDLE_REVERSE, INFO.DEFAULT_SPINDLE_SPEED)
+                a = self.joint
+                b = self.joint +1
+            for i in range(a,b):
+                if STATUS.is_spindle_on(i):
+                    ACTION.SET_SPINDLE_SLOWER(i)
+                else:
+                    ACTION.SET_SPINDLE_ROTATION(linuxcnc.SPINDLE_REVERSE, INFO.DEFAULT_SPINDLE_SPEED,i)
         elif self.limits_override:
             ACTION.TOGGLE_LIMITS_OVERRIDE()
         elif self.flood:
